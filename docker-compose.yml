@@ -1,0 +1,28 @@
+services:
+  tpf_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ./:/usr/src
+      - /usr/src/node_modules
+    depends_on:
+      - tpf_db
+
+  tpf_db:
+    image: mysql
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_TCP_PORT: ${DB_PORT}
+    volumes:
+      - tpf_db_data:/var/lib/mysql
+
+volumes:
+  tpf_db_data:

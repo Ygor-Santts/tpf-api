@@ -1,0 +1,20 @@
+{
+  "name": "marketplace",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/marketplace/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/core/marketplace",
+        "tsConfig": "libs/core/marketplace/tsconfig.lib.json",
+        "packageJson": "libs/core/marketplace/package.json",
+        "main": "libs/core/marketplace/src/index.ts",
+        "assets": ["libs/core/marketplace/*.md"]
+      }
+    }
+  }
+}
