@@ -6,6 +6,7 @@ import { HttpExceptionReturnInterceptor } from '@tpf/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
 
   const config = new DocumentBuilder()
     .setTitle('TPF API')
