@@ -10,7 +10,13 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         },
         "name": {
@@ -20,7 +26,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": false,
           "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "string"
         },
         "state": {
@@ -30,26 +42,32 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": false,
           "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "string"
         }
       },
       "name": "city",
       "indexes": [
         {
-          "keyName": "PRIMARY",
           "columnNames": [
             "id"
           ],
-          "composite": false,
-          "constraint": true,
+          "keyName": "PRIMARY",
+          "unique": true,
           "primary": true,
-          "unique": true
+          "constraint": true
         }
       ],
       "checks": [],
       "foreignKeys": {},
-      "nativeEnums": {}
+      "nativeEnums": {},
+      "comment": ""
     },
     {
       "columns": {
@@ -60,7 +78,13 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         },
         "name": {
@@ -70,26 +94,32 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": false,
           "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "string"
         }
       },
       "name": "job_category",
       "indexes": [
         {
-          "keyName": "PRIMARY",
           "columnNames": [
             "id"
           ],
-          "composite": false,
-          "constraint": true,
+          "keyName": "PRIMARY",
+          "unique": true,
           "primary": true,
-          "unique": true
+          "constraint": true
         }
       ],
       "checks": [],
       "foreignKeys": {},
-      "nativeEnums": {}
+      "nativeEnums": {},
+      "comment": ""
     },
     {
       "columns": {
@@ -100,7 +130,13 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         },
         "name": {
@@ -110,7 +146,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": false,
           "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "string"
         },
         "category_id": {
@@ -120,7 +162,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         }
       },
@@ -130,39 +178,39 @@
           "columnNames": [
             "category_id"
           ],
-          "composite": false,
           "keyName": "job_occupation_category_id_index",
-          "constraint": false,
+          "unique": false,
           "primary": false,
-          "unique": false
+          "constraint": false
         },
         {
-          "keyName": "PRIMARY",
           "columnNames": [
             "id"
           ],
-          "composite": false,
-          "constraint": true,
+          "keyName": "PRIMARY",
+          "unique": true,
           "primary": true,
-          "unique": true
+          "constraint": true
         }
       ],
       "checks": [],
       "foreignKeys": {
         "job_occupation_category_id_foreign": {
-          "constraintName": "job_occupation_category_id_foreign",
           "columnNames": [
             "category_id"
           ],
+          "constraintName": "job_occupation_category_id_foreign",
           "localTableName": "job_occupation",
+          "referencedTableName": "job_category",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "job_category",
-          "updateRule": "cascade"
+          "updateRule": "cascade",
+          "deleteRule": "no action"
         }
       },
-      "nativeEnums": {}
+      "nativeEnums": {},
+      "comment": ""
     },
     {
       "columns": {
@@ -173,7 +221,13 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         },
         "name": {
@@ -183,7 +237,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": false,
           "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "string"
         },
         "password": {
@@ -193,7 +253,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": false,
           "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "string"
         },
         "email": {
@@ -203,7 +269,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": true,
           "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "string"
         },
         "phone": {
@@ -213,7 +285,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": true,
           "length": 255,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "string"
         },
         "worker_id": {
@@ -223,38 +301,61 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "unique": true,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         },
-        "created_at": {
-          "name": "created_at",
+        "createdAt": {
+          "name": "createdAt",
           "type": "timestamp",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "unique": false,
+          "length": 0,
+          "precision": null,
+          "scale": null,
           "default": "CURRENT_TIMESTAMP",
+          "comment": null,
+          "enumItems": [],
           "mappedType": "datetime"
         },
-        "updated_at": {
-          "name": "updated_at",
+        "updatedAt": {
+          "name": "updatedAt",
           "type": "timestamp",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "unique": false,
+          "length": 0,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "datetime"
         },
-        "last_access": {
-          "name": "last_access",
+        "lastAccess": {
+          "name": "lastAccess",
           "type": "timestamp",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "unique": false,
+          "length": 0,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "datetime"
         },
         "enabled": {
@@ -264,8 +365,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 1,
+          "unique": false,
+          "length": null,
+          "precision": 3,
+          "scale": 0,
           "default": "true",
+          "comment": null,
+          "enumItems": [],
           "mappedType": "boolean"
         }
       },
@@ -273,62 +379,59 @@
       "indexes": [
         {
           "columnNames": [
+            "id"
+          ],
+          "keyName": "PRIMARY",
+          "unique": true,
+          "primary": true,
+          "constraint": true
+        },
+        {
+          "columnNames": [
             "email"
           ],
-          "composite": false,
           "keyName": "user_email_unique",
-          "constraint": true,
+          "unique": true,
           "primary": false,
-          "unique": true
+          "constraint": true
         },
         {
           "columnNames": [
             "phone"
           ],
-          "composite": false,
           "keyName": "user_phone_unique",
-          "constraint": true,
+          "unique": true,
           "primary": false,
-          "unique": true
+          "constraint": true
         },
         {
           "columnNames": [
             "worker_id"
           ],
-          "composite": false,
           "keyName": "user_worker_id_unique",
-          "constraint": true,
+          "unique": true,
           "primary": false,
-          "unique": true
-        },
-        {
-          "keyName": "PRIMARY",
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
+          "constraint": true
         }
       ],
       "checks": [],
       "foreignKeys": {
         "user_worker_id_foreign": {
-          "constraintName": "user_worker_id_foreign",
           "columnNames": [
             "worker_id"
           ],
+          "constraintName": "user_worker_id_foreign",
           "localTableName": "user",
+          "referencedTableName": "worker",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "worker",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
+          "updateRule": "cascade",
+          "deleteRule": "set null"
         }
       },
-      "nativeEnums": {}
+      "nativeEnums": {},
+      "comment": ""
     },
     {
       "columns": {
@@ -339,7 +442,13 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         },
         "user_id": {
@@ -349,7 +458,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "unique": true,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         }
       },
@@ -357,41 +472,41 @@
       "indexes": [
         {
           "columnNames": [
-            "user_id"
-          ],
-          "composite": false,
-          "keyName": "worker_user_id_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
-          "keyName": "PRIMARY",
-          "columnNames": [
             "id"
           ],
-          "composite": false,
-          "constraint": true,
+          "keyName": "PRIMARY",
+          "unique": true,
           "primary": true,
-          "unique": true
+          "constraint": true
+        },
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "keyName": "worker_user_id_unique",
+          "unique": true,
+          "primary": false,
+          "constraint": true
         }
       ],
       "checks": [],
       "foreignKeys": {
         "worker_user_id_foreign": {
-          "constraintName": "worker_user_id_foreign",
           "columnNames": [
             "user_id"
           ],
+          "constraintName": "worker_user_id_foreign",
           "localTableName": "worker",
+          "referencedTableName": "user",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "user",
-          "updateRule": "cascade"
+          "updateRule": "cascade",
+          "deleteRule": "no action"
         }
       },
-      "nativeEnums": {}
+      "nativeEnums": {},
+      "comment": ""
     },
     {
       "columns": {
@@ -400,9 +515,15 @@
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
-          "primary": false,
+          "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         },
         "job_occupation_id": {
@@ -410,9 +531,15 @@
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
-          "primary": false,
+          "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         }
       },
@@ -420,66 +547,65 @@
       "indexes": [
         {
           "columnNames": [
-            "worker_id"
-          ],
-          "composite": false,
-          "keyName": "worker_job_occupations_worker_id_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "job_occupation_id"
-          ],
-          "composite": false,
-          "keyName": "worker_job_occupations_job_occupation_id_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "PRIMARY",
-          "columnNames": [
             "worker_id",
             "job_occupation_id"
           ],
-          "composite": true,
-          "constraint": true,
+          "keyName": "PRIMARY",
+          "unique": true,
           "primary": true,
-          "unique": true
+          "constraint": true,
+          "composite": true
+        },
+        {
+          "columnNames": [
+            "job_occupation_id"
+          ],
+          "keyName": "worker_job_occupations_job_occupation_id_index",
+          "unique": false,
+          "primary": false,
+          "constraint": false
+        },
+        {
+          "columnNames": [
+            "worker_id"
+          ],
+          "keyName": "worker_job_occupations_worker_id_index",
+          "unique": false,
+          "primary": false,
+          "constraint": false
         }
       ],
       "checks": [],
       "foreignKeys": {
-        "worker_job_occupations_worker_id_foreign": {
-          "constraintName": "worker_job_occupations_worker_id_foreign",
-          "columnNames": [
-            "worker_id"
-          ],
-          "localTableName": "worker_job_occupations",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "worker",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        },
         "worker_job_occupations_job_occupation_id_foreign": {
-          "constraintName": "worker_job_occupations_job_occupation_id_foreign",
           "columnNames": [
             "job_occupation_id"
           ],
+          "constraintName": "worker_job_occupations_job_occupation_id_foreign",
           "localTableName": "worker_job_occupations",
+          "referencedTableName": "job_occupation",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "job_occupation",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "worker_job_occupations_worker_id_foreign": {
+          "columnNames": [
+            "worker_id"
+          ],
+          "constraintName": "worker_job_occupations_worker_id_foreign",
+          "localTableName": "worker_job_occupations",
+          "referencedTableName": "worker",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
         }
       },
-      "nativeEnums": {}
+      "nativeEnums": {},
+      "comment": ""
     },
     {
       "columns": {
@@ -488,9 +614,15 @@
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
-          "primary": false,
+          "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         },
         "city_id": {
@@ -498,9 +630,15 @@
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
-          "primary": false,
+          "primary": true,
           "nullable": false,
+          "unique": false,
           "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
           "mappedType": "integer"
         }
       },
@@ -508,66 +646,65 @@
       "indexes": [
         {
           "columnNames": [
-            "worker_id"
-          ],
-          "composite": false,
-          "keyName": "worker_operation_cities_worker_id_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "city_id"
-          ],
-          "composite": false,
-          "keyName": "worker_operation_cities_city_id_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "PRIMARY",
-          "columnNames": [
             "worker_id",
             "city_id"
           ],
-          "composite": true,
-          "constraint": true,
+          "keyName": "PRIMARY",
+          "unique": true,
           "primary": true,
-          "unique": true
+          "constraint": true,
+          "composite": true
+        },
+        {
+          "columnNames": [
+            "city_id"
+          ],
+          "keyName": "worker_operation_cities_city_id_index",
+          "unique": false,
+          "primary": false,
+          "constraint": false
+        },
+        {
+          "columnNames": [
+            "worker_id"
+          ],
+          "keyName": "worker_operation_cities_worker_id_index",
+          "unique": false,
+          "primary": false,
+          "constraint": false
         }
       ],
       "checks": [],
       "foreignKeys": {
-        "worker_operation_cities_worker_id_foreign": {
-          "constraintName": "worker_operation_cities_worker_id_foreign",
-          "columnNames": [
-            "worker_id"
-          ],
-          "localTableName": "worker_operation_cities",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "worker",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        },
         "worker_operation_cities_city_id_foreign": {
-          "constraintName": "worker_operation_cities_city_id_foreign",
           "columnNames": [
             "city_id"
           ],
+          "constraintName": "worker_operation_cities_city_id_foreign",
           "localTableName": "worker_operation_cities",
+          "referencedTableName": "city",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "city",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "worker_operation_cities_worker_id_foreign": {
+          "columnNames": [
+            "worker_id"
+          ],
+          "constraintName": "worker_operation_cities_worker_id_foreign",
+          "localTableName": "worker_operation_cities",
+          "referencedTableName": "worker",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
         }
       },
-      "nativeEnums": {}
+      "nativeEnums": {},
+      "comment": ""
     }
   ],
   "nativeEnums": {}

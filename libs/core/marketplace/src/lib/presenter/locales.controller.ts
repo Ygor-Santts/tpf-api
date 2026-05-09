@@ -5,8 +5,9 @@ import {
   IGetCitiesByStateResponseDTO,
 } from '../use-cases/views/get-cities-by-state';
 import { EStatesCode } from '@tpf/common';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('Locales')
 @Controller('locales')
 export class LocalesController {
   constructor(
@@ -15,6 +16,7 @@ export class LocalesController {
   ) {}
 
   @Get('state/:id/cities')
+  @ApiOperation({ summary: 'Listar cidades por estado' })
   @ApiResponse({
     status: 200,
     description: 'Returns all cities by state',
@@ -25,6 +27,7 @@ export class LocalesController {
   }
 
   @Get('states')
+  @ApiOperation({ summary: 'Listar todos os estados' })
   @ApiResponse({
     status: 200,
     description: 'Returns all states',

@@ -4,9 +4,10 @@ import {
   GetWorkersByParametersPaginated,
   IGetWorkersByParametersPaginatedResponseDTO,
 } from '../use-cases/views/get-workers-by-parameters-paginated';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { IGenericExceptionResponseDTO } from '@tpf/common';
 
+@ApiTags('Workers')
 @Controller('worker')
 export class WorkerController {
   constructor(
@@ -14,6 +15,7 @@ export class WorkerController {
   ) {}
 
   @Get('paginated')
+  @ApiOperation({ summary: 'Buscar trabalhadores com filtros paginados' })
   @ApiResponse({
     status: 200,
     description: 'Get workers by parameters paginated',

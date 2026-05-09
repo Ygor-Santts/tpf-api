@@ -6,6 +6,7 @@ import { services } from './use-cases/services';
 import { repositories } from './data-access';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import type { StringValue } from 'ms';
 import { User, Worker } from '@tpf/domain';
 
 @Module({
@@ -16,7 +17,7 @@ import { User, Worker } from '@tpf/domain';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secret'),
         signOptions: {
-          expiresIn: configService.get<string>('jwt.expiration'),
+          expiresIn: configService.get<string>('jwt.expiration') as StringValue,
         },
       }),
     }),

@@ -5,7 +5,9 @@ import {
   HealthCheckService,
 } from '@nestjs/terminus';
 import { DatabaseHealthCheck } from '.';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('Health')
 @Controller('health-check')
 export class AppController {
   constructor(
@@ -14,6 +16,7 @@ export class AppController {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: 'Verificar saúde da API e do banco de dados' })
   @HealthCheck()
   healthCheck(): Promise<HealthCheckResult> {
     Logger.log(`Get /health-check`);

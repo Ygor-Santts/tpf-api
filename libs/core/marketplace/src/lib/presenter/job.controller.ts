@@ -3,13 +3,14 @@ import {
   GetJobOccupationsByCategory,
   IGetJobOccupationsByCategoryResponseDTO,
 } from '../use-cases/views/get-job-occupations-by-category';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
 import {
   GetJobCategories,
   IGetJobCategoriesResponseDTO,
 } from '../use-cases/views/get-job-categories';
 import { IGenericExceptionResponseDTO } from '@tpf/common';
 
+@ApiTags('Jobs')
 @Controller('job')
 export class JobController {
   constructor(
@@ -18,6 +19,7 @@ export class JobController {
   ) {}
 
   @Get('categories')
+  @ApiOperation({ summary: 'Listar todas as categorias de trabalho' })
   @ApiResponse({
     status: 200,
     description: 'Returns all job categories',
@@ -28,6 +30,7 @@ export class JobController {
   }
 
   @Get('category/:categoryId/occupations')
+  @ApiOperation({ summary: 'Listar ocupações por categoria' })
   @ApiResponse({
     status: 200,
     description: 'Returns all occupations by category',

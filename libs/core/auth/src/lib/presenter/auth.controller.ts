@@ -3,9 +3,10 @@ import { RegisterWorkerDTO } from './dtos';
 import { IRegisterWorker } from '../use-cases/services/register-worker';
 import { ILogin, ILoginResponseDTO } from '../use-cases/services/login';
 import { LoginDTO } from './dtos/login.dto';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { IGenericExceptionResponseDTO } from '@tpf/common';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -14,6 +15,7 @@ export class AuthController {
   ) {}
 
   @Post('sign-in')
+  @ApiOperation({ summary: 'Login de usuário' })
   @ApiResponse({
     status: 200,
     description: 'User logged in successfully',
@@ -30,6 +32,7 @@ export class AuthController {
   }
 
   @Post('worker/sign-up')
+  @ApiOperation({ summary: 'Cadastro de trabalhador' })
   @ApiResponse({
     status: 200,
     description: 'Worker registered successfully',
