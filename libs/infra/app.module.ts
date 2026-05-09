@@ -10,6 +10,7 @@ import { CoreCommonModule } from '@tpf/common';
 import { CoreAuthModule } from '@tpf/auth';
 import { CoreMarketplaceModule } from '@tpf/marketplace';
 import { CoreAnalyticsModule } from '@tpf/analytics';
+import { CoreWorkerModule } from '@tpf/worker';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CoreAnalyticsModule } from '@tpf/analytics';
     CoreAuthModule,
     CoreMarketplaceModule,
     CoreAnalyticsModule,
+    CoreWorkerModule,
   ],
   controllers: [AppController],
   providers: [DatabaseHealthCheck],

@@ -9,6 +9,7 @@ export abstract class IWorkerRepository {
     dto: GetWorkerByParametersPaginatedDTO,
     populate?: IRelationshipAutoMap<Worker>,
   ): Promise<[IWorker[], number]>;
+  abstract getRatingsByWorkerIds(workerIds: number[]): Promise<Map<number, { average: number; count: number }>>;
 }
 
 @Injectable()
@@ -23,23 +24,46 @@ export class WorkerRepository implements IWorkerRepository {
     dto: GetWorkerByParametersPaginatedDTO,
     populate?: IRelationshipAutoMap<IWorker>,
   ): Promise<[IWorker[], number]> {
-    const { page, limit } = dto;
+    const { page, limit, minRating } = dto;
 
-    const where = this.createWhereClause(dto);
+    let eligibleWorkerIds: number[] | undefined;
+    if (minRating !== undefined) {
+      const rows = await this.em.execute(
+        `SELECT worker_id FROM rating GROUP BY worker_id HAVING AVG(score) >= ?`,
+        [minRating],
+      );
+      eligibleWorkerIds = rows.map((r: any) => r.worker_id);
+      if (eligibleWorkerIds.length === 0) return [[], 0];
+    }
+
+    const where = this.createWhereClause(dto, eligibleWorkerIds);
 
     return this._repository.findAndCount(where, {
       limit,
       offset: (page - 1) * limit,
       populate,
-      orderBy: {
-        user: {
-          name: 'ASC',
-        },
-      },
+      orderBy: { user: { name: 'ASC' } },
     });
   }
 
-  private createWhereClause(dto: GetWorkerByParametersPaginatedDTO) {
+  async getRatingsByWorkerIds(workerIds: number[]): Promise<Map<number, { average: number; count: number }>> {
+    const map = new Map<number, { average: number; count: number }>();
+    if (!workerIds.length) return map;
+
+    const rows = await this.em.execute(
+      `SELECT worker_id, AVG(score) as average, COUNT(*) as count FROM rating WHERE worker_id IN (${workerIds.map(() => '?').join(',')}) GROUP BY worker_id`,
+      workerIds,
+    );
+    for (const row of rows) {
+      map.set(Number(row['worker_id']), {
+        average: row['average'] ? Number(Number(row['average']).toFixed(1)) : 0,
+        count: Number(row['count']),
+      });
+    }
+    return map;
+  }
+
+  private createWhereClause(dto: GetWorkerByParametersPaginatedDTO, eligibleWorkerIds?: number[]) {
     const whereClause: FilterQuery<IWorker> = {};
 
     if (dto.name) {
@@ -58,6 +82,10 @@ export class WorkerRepository implements IWorkerRepository {
       whereClause.jobOccupations = {
         category: { id: { $in: dto.jobCategoriyIds } },
       };
+
+    if (eligibleWorkerIds !== undefined) {
+      whereClause.id = { $in: eligibleWorkerIds };
+    }
 
     return whereClause;
   }

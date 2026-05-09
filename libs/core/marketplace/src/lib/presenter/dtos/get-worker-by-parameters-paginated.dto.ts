@@ -35,4 +35,9 @@ export class GetWorkerByParametersPaginatedDTO extends PaginationDTO {
   @IsNumber({}, { each: true })
   @ToNumberArray()
   jobCategoriyIds?: number[];
+
+  @ApiProperty({ example: 4, required: false, minimum: 1, maximum: 5 })
+  @IsOptional()
+  @IsNumber()
+  minRating?: number;
 }

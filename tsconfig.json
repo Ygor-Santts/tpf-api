@@ -22,7 +22,8 @@
       "@tpf/auth": ["libs/core/auth/src"],
       "@tpf/common": ["libs/core/common/src"],
       "@tpf/marketplace": ["libs/core/marketplace/src"],
-      "@tpf/domain": ["libs/core/domain/src"]
+      "@tpf/domain": ["libs/core/domain/src"],
+      "@tpf/worker": ["libs/core/worker/src"]
     }
   },
   "watchOptions": {

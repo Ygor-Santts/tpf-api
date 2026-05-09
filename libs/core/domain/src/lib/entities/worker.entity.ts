@@ -4,6 +4,7 @@ import {
   ManyToMany,
   OneToOne,
   PrimaryKey,
+  Property,
 } from '@mikro-orm/core';
 import { City, ICity, IJobOccupation, JobOccupation } from '@tpf/common';
 import { IUser, User } from './user.entity';
@@ -17,6 +18,7 @@ export interface ICreateWorkerEntityDTO {
 export abstract class IWorker {
   id!: number;
   user!: IUser;
+  bio?: string;
   jobOccupations!: Collection<IJobOccupation>;
   operationCities!: Collection<City>;
 }
@@ -28,6 +30,9 @@ export class Worker implements IWorker {
 
   @OneToOne(() => User, { joinColumn: 'user_id' })
   user!: IUser;
+
+  @Property({ nullable: true, length: 500 })
+  bio?: string;
 
   @ManyToMany(() => JobOccupation, undefined, {
     pivotTable: 'worker_job_occupations',
