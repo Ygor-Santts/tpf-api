@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { IRegisterWorkerDTO } from '../../presenter/dtos';
+import { IActivateWorkerDTO, IRegisterWorkerDTO } from '../../presenter/dtos';
 import { IUserRepository } from '../../data-access/repositories';
 import { IWorkerRepository } from '../../data-access/repositories/worker.repository';
 import { ICityRepository, IJobOccupationRepository } from '@tpf/common';
@@ -26,14 +26,7 @@ export class RegisterWorker implements IRegisterWorker {
   ) {}
 
   async execute(dto: IRegisterWorkerDTO): Promise<void | HttpException> {
-    const {
-      email,
-      phone,
-      password,
-      name,
-      jobOccupationIds,
-      operationCitiesIds,
-    } = dto;
+    const { email, phone, password, name } = dto;
 
     const existUserWithSameData = await this.userRepository.existsByParams({
       email,
@@ -43,20 +36,13 @@ export class RegisterWorker implements IRegisterWorker {
     if (existUserWithSameData)
       return new ConflictException('Email ou telefone já estão cadastrados');
 
-    const [jobOccupations, operationCities] = await Promise.all([
-      this.jobOccupationRepository.getByIds(jobOccupationIds),
-      this.cityRepository.getByIds(operationCitiesIds),
-    ]);
-
-    const errors = [];
-
-    if (jobOccupations.length !== jobOccupationIds.length)
-      errors.push('Profissões de trabalho não encontradas');
-
-    if (operationCities.length !== operationCitiesIds.length)
-      errors.push('Cidades de operação não encontradas');
-
-    if (errors.length) return new NotFoundException(errors.join('; '));
+    const refs = await findWorkerRefs(
+      this.jobOccupationRepository,
+      this.cityRepository,
+      dto,
+    );
+    if (refs instanceof NotFoundException) return refs;
+    const { jobOccupations, operationCities } = refs;
 
     const passwordCrypted = await bcrypt.hash(password, this.saltOrRounds);
 
@@ -77,4 +63,28 @@ export class RegisterWorker implements IRegisterWorker {
 
     await this.userRepository.saveWorkerUser(user, worker);
   }
+}
+
+export async function findWorkerRefs(
+  jobOccupationRepository: IJobOccupationRepository,
+  cityRepository: ICityRepository,
+  dto: IActivateWorkerDTO,
+) {
+  const { jobOccupationIds, operationCitiesIds } = dto;
+  const [jobOccupations, operationCities] = await Promise.all([
+    jobOccupationRepository.getByIds(jobOccupationIds),
+    cityRepository.getByIds(operationCitiesIds),
+  ]);
+
+  const errors = [];
+
+  if (jobOccupations.length !== jobOccupationIds.length)
+    errors.push('Profissões de trabalho não encontradas');
+
+  if (operationCities.length !== operationCitiesIds.length)
+    errors.push('Cidades de operação não encontradas');
+
+  if (errors.length) return new NotFoundException(errors.join('; '));
+
+  return { jobOccupations, operationCities };
 }

@@ -8,7 +8,12 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ForgotPasswordDTO, RegisterWorkerDTO, ResetPasswordDTO } from './dtos';
+import {
+  ActivateWorkerDTO,
+  ForgotPasswordDTO,
+  RegisterWorkerDTO,
+  ResetPasswordDTO,
+} from './dtos';
 import { IRegisterWorker } from '../use-cases/services/register-worker';
 import { ILogin, ILoginResponseDTO } from '../use-cases/services/login';
 import { LoginDTO } from './dtos/login.dto';
@@ -16,6 +21,7 @@ import { ApiBearerAuth, ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagg
 import { IGenericExceptionResponseDTO } from '@tpf/common';
 import { IRegisterClient, RegisterClientDTO } from '../use-cases/services/register-client';
 import { IGetMe } from '../use-cases/services/get-me';
+import { IActivateWorker } from '../use-cases/services/activate-worker';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import {
   IForgotPassword,
@@ -32,6 +38,7 @@ export class AuthController {
     private readonly getMeUseCase: IGetMe,
     private readonly forgotPasswordUseCase: IForgotPassword,
     private readonly resetPasswordUseCase: IResetPassword,
+    private readonly activateWorkerUseCase: IActivateWorker,
   ) {}
 
   @Post('sign-in')
@@ -49,6 +56,17 @@ export class AuthController {
   @ApiResponse({ status: 409, type: IGenericExceptionResponseDTO })
   workerSignUp(@Body() body: RegisterWorkerDTO) {
     return this.registerWorkerUseCase.execute(body);
+  }
+
+  @Post('worker/activate')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Ativa o perfil de trabalhador do usuário logado' })
+  @ApiResponse({ status: 201, type: ILoginResponseDTO })
+  @ApiResponse({ status: 404, type: IGenericExceptionResponseDTO })
+  @ApiResponse({ status: 409, type: IGenericExceptionResponseDTO })
+  activateWorker(@Request() req: any, @Body() body: ActivateWorkerDTO) {
+    return this.activateWorkerUseCase.execute(req.user.userId, body);
   }
 
   @Post('client/sign-up')
