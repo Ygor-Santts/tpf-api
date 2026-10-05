@@ -3,6 +3,7 @@ import { RegisterWorker, IRegisterWorker } from './register-worker';
 import { ILogin, Login } from './login';
 import { IRegisterClient, RegisterClient } from './register-client';
 import { IGetMe, GetMe } from './get-me';
+import { IActivateWorker, ActivateWorker } from './activate-worker';
 import {
   IForgotPassword,
   ForgotPassword,
@@ -15,6 +16,7 @@ export const services: Provider[] = [
   { useClass: Login, provide: ILogin },
   { useClass: RegisterClient, provide: IRegisterClient },
   { useClass: GetMe, provide: IGetMe },
+  { useClass: ActivateWorker, provide: IActivateWorker },
   { useClass: ForgotPassword, provide: IForgotPassword },
   { useClass: ResetPassword, provide: IResetPassword },
 ];

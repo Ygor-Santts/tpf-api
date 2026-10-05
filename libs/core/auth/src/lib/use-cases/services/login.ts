@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { IUserRepository } from '../../data-access/repositories';
 import { ILoginDTO } from '../../presenter/dtos/login.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { IUser } from '@tpf/domain';
 
 export class UserProfileDTO {
   @ApiProperty() id: number;
@@ -23,9 +24,7 @@ export class ILoginResponseDTO {
 }
 
 export abstract class ILogin {
-  abstract execute(
-    dto: ILoginDTO,
-  ): Promise<ILoginResponseDTO | HttpException>;
+  abstract execute(dto: ILoginDTO): Promise<ILoginResponseDTO | HttpException>;
 }
 
 @Injectable()
@@ -53,19 +52,33 @@ export class Login implements ILogin {
     user.loggedIn();
     await this.userRepository.save(user);
 
-    const isWorker = Boolean(user.worker);
-    const workerId = user.worker?.id;
+    return createSession(user, this.jwtService);
+  }
+}
 
-    const access_token = await this.jwtService.signAsync({
-      email,
-      userId: user.id,
+export async function createSession(
+  user: IUser,
+  jwtService: JwtService,
+): Promise<ILoginResponseDTO> {
+  const isWorker = Boolean(user.worker);
+  const workerId = user.worker?.id;
+
+  const access_token = await jwtService.signAsync({
+    email: user.email,
+    userId: user.id,
+    isWorker,
+    workerId,
+  });
+
+  return {
+    access_token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
       isWorker,
       workerId,
-    });
-
-    return {
-      access_token,
-      user: { id: user.id, name: user.name, email: user.email, phone: user.phone, isWorker, workerId },
-    };
-  }
+    },
+  };
 }

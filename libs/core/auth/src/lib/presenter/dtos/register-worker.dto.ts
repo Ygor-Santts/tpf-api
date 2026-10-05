@@ -11,16 +11,38 @@ import {
   IsPhoneNumber,
 } from 'class-validator';
 
-export interface IRegisterWorkerDTO {
-  name: string;
-  password: string;
-  email: string;
-  phone: string;
+export interface IActivateWorkerDTO {
   jobOccupationIds: number[];
   operationCitiesIds: number[];
 }
 
-export abstract class RegisterWorkerDTO implements IRegisterWorkerDTO {
+export interface IRegisterWorkerDTO extends IActivateWorkerDTO {
+  name: string;
+  password: string;
+  email: string;
+  phone: string;
+}
+
+export class ActivateWorkerDTO implements IActivateWorkerDTO {
+  @ApiProperty({ example: [1, 2, 3] })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  jobOccupationIds!: number[];
+
+  @ApiProperty({ example: [7, 8, 9] })
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsInt({ each: true })
+  @Min(1, { each: true })
+  operationCitiesIds!: number[];
+}
+
+export class RegisterWorkerDTO
+  extends ActivateWorkerDTO
+  implements IRegisterWorkerDTO
+{
   @ApiProperty({ example: 'John Doe' })
   @IsString()
   @IsNotEmpty()
@@ -42,18 +64,4 @@ export abstract class RegisterWorkerDTO implements IRegisterWorkerDTO {
   @IsNotEmpty()
   @MinLength(8)
   password!: string;
-
-  @ApiProperty({ example: [1, 2, 3] })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsInt({ each: true })
-  @Min(1, { each: true })
-  jobOccupationIds!: number[];
-
-  @ApiProperty({ example: [7, 8, 9] })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsInt({ each: true })
-  @Min(1, { each: true })
-  operationCitiesIds!: number[];
 }
