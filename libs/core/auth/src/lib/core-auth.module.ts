@@ -7,7 +7,7 @@ import { repositories } from './data-access';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import type { StringValue } from 'ms';
-import { User, Worker } from '@tpf/domain';
+import { PasswordResetToken, User, Worker } from '@tpf/domain';
 import { JwtAuthGuard } from './guards/jwt.guard';
 
 @Module({
@@ -22,7 +22,7 @@ import { JwtAuthGuard } from './guards/jwt.guard';
         },
       }),
     }),
-    MikroOrmModule.forFeature([Worker, User]),
+    MikroOrmModule.forFeature([Worker, User, PasswordResetToken]),
     CoreCommonModule,
   ],
   providers: [...services, ...repositories, JwtAuthGuard],

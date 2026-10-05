@@ -1,5 +1,10 @@
 import { Provider } from '@nestjs/common';
-import { IUserRepository, UserRepository } from './repositories';
+import {
+  IPasswordResetTokenRepository,
+  IUserRepository,
+  PasswordResetTokenRepository,
+  UserRepository,
+} from './repositories';
 import {
   IWorkerRepository,
   WorkerRepository,
@@ -13,5 +18,9 @@ export const repositories: Provider[] = [
   {
     provide: IWorkerRepository,
     useClass: WorkerRepository,
+  },
+  {
+    provide: IPasswordResetTokenRepository,
+    useClass: PasswordResetTokenRepository,
   },
 ];

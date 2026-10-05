@@ -1,6 +1,14 @@
 import { EEnvironment } from '@tpf/common';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+} from 'class-validator';
 abstract class IEnvironmentVariables {
   @IsEnum(EEnvironment)
   @IsNotEmpty()
@@ -47,6 +55,16 @@ abstract class IEnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   JWT_EXPIRATION!: string;
+
+  @IsOptional()
+  @IsUrl({ require_tld: false })
+  APP_URL?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  PASSWORD_RESET_EXPIRATION_MINUTES?: number;
 }
 
 export class EnvironmentVariables extends IEnvironmentVariables {}

@@ -21,6 +21,7 @@ export abstract class IUser {
 
   abstract setWorker(worker: IWorker): void;
   abstract loggedIn(): void;
+  abstract changePassword(passwordHash: string): void;
 }
 
 @Entity({ tableName: 'user' })
@@ -84,5 +85,9 @@ export class User implements IUser {
 
   loggedIn() {
     this.lastAccess = new Date();
+  }
+
+  changePassword(passwordHash: string) {
+    this.password = passwordHash;
   }
 }
