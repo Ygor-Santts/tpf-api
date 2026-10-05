@@ -14,6 +14,9 @@ export interface IConfiguration {
     secret: string;
     expiration: string;
   };
+  app: {
+    url: string;
+  };
 }
 
 export const configuration = (): IConfiguration => ({
@@ -29,5 +32,8 @@ export const configuration = (): IConfiguration => ({
   jwt: {
     secret: process.env.JWT_SECRET,
     expiration: process.env.JWT_EXPIRATION,
+  },
+  app: {
+    url: process.env.APP_URL || 'http://localhost:5173',
   },
 });
