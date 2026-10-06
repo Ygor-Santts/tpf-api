@@ -17,6 +17,15 @@ export class City implements ICity {
   @Property()
   state!: string;
 
+  @Property({ fieldName: 'ibge_id', nullable: true, unique: true })
+  ibgeId?: number;
+
+  @Property({ type: 'double', nullable: true })
+  latitude?: number;
+
+  @Property({ type: 'double', nullable: true })
+  longitude?: number;
+
   constructor(props: { name: string; state: string }) {
     this.name = props.name;
     this.state = props.state;

@@ -50,10 +50,68 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "string"
+        },
+        "ibge_id": {
+          "name": "ibge_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": 10,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "latitude": {
+          "name": "latitude",
+          "type": "double",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "double"
+        },
+        "longitude": {
+          "name": "longitude",
+          "type": "double",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "double"
         }
       },
       "name": "city",
       "indexes": [
+        {
+          "columnNames": [
+            "ibge_id"
+          ],
+          "composite": false,
+          "keyName": "city_ibge_id_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "columnNames": [
             "id"
