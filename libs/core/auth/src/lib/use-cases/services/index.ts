@@ -4,6 +4,7 @@ import { ILogin, Login } from './login';
 import { IRegisterClient, RegisterClient } from './register-client';
 import { IGetMe, GetMe } from './get-me';
 import { IActivateWorker, ActivateWorker } from './activate-worker';
+import { IDeleteAccount, DeleteAccount } from './delete-account';
 import {
   IForgotPassword,
   ForgotPassword,
@@ -19,4 +20,5 @@ export const services: Provider[] = [
   { useClass: ActivateWorker, provide: IActivateWorker },
   { useClass: ForgotPassword, provide: IForgotPassword },
   { useClass: ResetPassword, provide: IResetPassword },
+  { useClass: DeleteAccount, provide: IDeleteAccount },
 ];
