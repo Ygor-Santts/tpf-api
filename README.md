@@ -105,6 +105,47 @@ Você pode configurar as variáveis de ambiente no arquivo `.env`.
 
 ---
 
+## 🌐 Servidor (DEV e PROD)
+
+O `docker-compose.server.yml` sobe tudo num servidor com Docker: a API (compilada, sem modo dev), o MySQL (sem porta aberta para a internet) e o Caddy, que cuida do HTTPS sozinho. O banco e as fotos do portfólio ficam em volumes, então não somem quando a API é atualizada. As migrations rodam sozinhas sempre que a API sobe.
+
+Cada ambiente é uma pasta separada no servidor (por exemplo `~/tpf-dev` e `~/tpf-prod`), com o seu próprio `.env.server`.
+
+```bash
+git clone https://github.com/Ygor-Santts/tpf-api.git ~/tpf-dev && cd ~/tpf-dev
+cp .env.server.example .env.server   # preencha domínio, senhas e JWT_SECRET
+docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
+```
+
+O domínio do `.env.server` precisa apontar para o IP do servidor (registro DNS tipo A) antes de subir, para o Caddy conseguir o certificado. Para testar no seu PC, use `DOMAIN=localhost` e abra `https://localhost/api-docs`.
+
+Comandos do dia a dia (dentro da pasta do ambiente):
+
+```bash
+alias dc='docker compose --env-file .env.server -f docker-compose.server.yml'
+git pull && dc up -d --build    # atualizar para a versão mais nova
+dc logs -f api                  # ver os logs da API
+dc exec api npm run seed        # dados de teste (só com NODE_ENV=development)
+dc exec api npm run destaque -- email@x.com 30
+```
+
+### Levar os dados do seu PC para o DEV
+
+Só se você tiver dados locais que o seed não cria. Nunca leve dados de teste para produção.
+
+```bash
+# 1. No seu PC, na pasta do tpf-api: exporta o banco e as fotos
+docker compose exec tpf_db sh -c 'mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" --no-tablespaces "$MYSQL_DATABASE"' > dump.sql
+tar -czf uploads.tgz uploads
+scp dump.sql uploads.tgz usuario@servidor:~/tpf-dev/
+
+# 2. No servidor, na pasta do ambiente: importa (substitui o banco de lá)
+dc exec -T db sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"' < dump.sql
+tar -xzf uploads.tgz && dc cp uploads/. api:/usr/src/uploads/ && rm -rf uploads dump.sql uploads.tgz
+```
+
+---
+
 ## 🧪 Testes
 
 Rodar os testes unitários:
