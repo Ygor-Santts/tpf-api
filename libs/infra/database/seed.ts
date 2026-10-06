@@ -252,9 +252,12 @@ async function main() {
 
       // trabalhador03 to 05 stay empty: no bio, no portfolio, no ratings.
       const empty = i >= 3 && i <= 5;
+      // Destaque: trabalhador06 and 07 active for 30 days, 08 expired yesterday.
+      const featuredUntil =
+        i === 6 || i === 7 ? daysAgo(-30) : i === 8 ? daysAgo(1) : null;
       const [res] = await db.query<ResultSetHeader>(
-        'insert into worker (user_id, bio) values (?, ?)',
-        [userId, empty ? null : pick(BIOS)],
+        'insert into worker (user_id, bio, featured_until) values (?, ?, ?)',
+        [userId, empty ? null : pick(BIOS), featuredUntil],
       );
       const workerId = res.insertId;
       await db.query('update user set worker_id = ? where id = ?', [

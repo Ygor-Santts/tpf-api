@@ -3,6 +3,7 @@ import { IPaginationDTO, PaginationDTO, ToNumberArray } from '@tpf/common';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsIn,
   IsLatitude,
   IsLongitude,
   IsNumber,
@@ -20,6 +21,7 @@ export interface IGetWorkerByParametersPaginatedDTO extends IPaginationDTO {
   latitude?: number;
   longitude?: number;
   radiusKm?: number;
+  sort?: 'best';
 }
 
 export class GetWorkerByParametersPaginatedDTO extends PaginationDTO {
@@ -85,4 +87,14 @@ export class GetWorkerByParametersPaginatedDTO extends PaginationDTO {
   @Max(100)
   @Type(() => Number)
   radiusKm?: number;
+
+  @ApiProperty({
+    enum: ['best'],
+    required: false,
+    description:
+      '"best" = Melhores no ramo: only workers with 3+ reviews, by average rating. By default workers with an active Destaque come first.',
+  })
+  @IsOptional()
+  @IsIn(['best'])
+  sort?: 'best';
 }

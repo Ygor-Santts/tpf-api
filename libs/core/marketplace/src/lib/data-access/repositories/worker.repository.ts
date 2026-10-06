@@ -6,6 +6,8 @@ import { IRelationshipAutoMap } from '@tpf/common';
 
 const DEFAULT_RADIUS_KM = 30;
 const MAX_RADIUS_KM = 100;
+/** "Melhores no ramo" only ranks workers with at least this many reviews. */
+const MIN_RATINGS_FOR_BEST = 3;
 
 export abstract class IWorkerRepository {
   abstract getWorkersByParametersPaginated(
@@ -44,24 +46,62 @@ export class WorkerRepository implements IWorkerRepository {
       if (!cityIds.length) return [[], 0];
     }
 
+    const best = dto.sort === 'best';
     let eligibleWorkerIds: number[] | undefined;
-    if (minRating !== undefined) {
+    if (minRating !== undefined || best) {
       const rows = await this.em.execute(
-        `SELECT worker_id FROM rating GROUP BY worker_id HAVING AVG(score) >= ?`,
-        [minRating],
+        `SELECT worker_id FROM rating GROUP BY worker_id HAVING AVG(score) >= ? AND COUNT(*) >= ?`,
+        [minRating ?? 0, best ? MIN_RATINGS_FOR_BEST : 1],
       );
       eligibleWorkerIds = rows.map((r: any) => r.worker_id);
       if (eligibleWorkerIds.length === 0) return [[], 0];
     }
 
     const where = this.createWhereClause(dto, cityIds, eligibleWorkerIds);
+    const matching = await this._repository.find(where, { fields: ['id'] });
+    if (!matching.length) return [[], 0];
 
-    return this._repository.findAndCount(where, {
+    const pageIds = await this.getOrderedPage(
+      matching.map((w) => w.id),
+      best,
       limit,
-      offset: (page - 1) * limit,
-      populate,
-      orderBy: { user: { name: 'ASC' } },
-    });
+      (page - 1) * limit,
+    );
+    const workers = pageIds.length
+      ? await this._repository.find({ id: { $in: pageIds } }, { populate })
+      : [];
+    workers.sort((a, b) => pageIds.indexOf(a.id) - pageIds.indexOf(b.id));
+    return [workers, matching.length];
+  }
+
+  /**
+   * One page of worker ids in display order. By default, workers with an
+   * active Destaque come first (best rated first among them), then everyone
+   * else by name. "best" ranks by rating only; Destaque does not count there.
+   */
+  private async getOrderedPage(
+    workerIds: number[],
+    best: boolean,
+    limit: number,
+    offset: number,
+  ): Promise<number[]> {
+    const featured = `(w.featured_until IS NOT NULL AND w.featured_until > NOW())`;
+    const orderBy = best
+      ? `r.average DESC, r.total DESC, u.name ASC`
+      : `${featured} DESC, IF(${featured}, COALESCE(r.average, 0), 0) DESC, u.name ASC`;
+    const rows = await this.em.execute(
+      `SELECT w.id FROM worker w
+        JOIN user u ON u.id = w.user_id
+        LEFT JOIN (
+          SELECT worker_id, AVG(score) AS average, COUNT(*) AS total
+          FROM rating GROUP BY worker_id
+        ) r ON r.worker_id = w.id
+        WHERE w.id IN (${workerIds.map(() => '?').join(',')})
+        ORDER BY ${orderBy}, w.id
+        LIMIT ? OFFSET ?`,
+      [...workerIds, limit, offset],
+    );
+    return rows.map((row: any) => Number(row.id));
   }
 
   async getRatingsByWorkerIds(

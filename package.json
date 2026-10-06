@@ -18,6 +18,7 @@
     "migration:down": "mikro-orm migration:down",
     "migration:generate": "mikro-orm migration:generate",
     "seed": "ts-node --transpile-only libs/infra/database/seed.ts",
+    "destaque": "ts-node --transpile-only libs/infra/database/destaque.ts",
     "lint": "eslint \"{apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",

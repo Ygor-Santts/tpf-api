@@ -64,6 +64,8 @@ Cria 40 contas de teste (10 clientes, 25 trabalhadores e 5 que também contratam
 | `trabalhador01@teste.com` | Trabalhador com muitas avaliações boas |
 | `trabalhador02@teste.com` | Trabalhador com nota baixa |
 | `trabalhador03@teste.com` a `trabalhador05@teste.com` | Perfil vazio: sem bio, portfólio ou avaliações |
+| `trabalhador06@teste.com` e `trabalhador07@teste.com` | Em destaque por 30 dias |
+| `trabalhador08@teste.com` | Destaque vencido ontem |
 | `ambos01@teste.com` a `ambos05@teste.com` | Trabalhador que também avalia outros |
 
 Pode rodar de novo quando quiser: ele apaga só as contas `@teste.com` e recria tudo igual. Contas reais, cidades e profissões não são alteradas. Não roda com `NODE_ENV=production`.
@@ -88,6 +90,7 @@ Este projeto utiliza o padrão **monorepo** com Nx. Os módulos estão organizad
 | `npm run migration:up` | Aplica as migrations |
 | `npm run migration:down` | Reverte a última migration |
 | `npm run seed` | Recria os dados de teste (contas `@teste.com`) |
+| `npm run destaque -- <email> <dias>` | Coloca um trabalhador em destaque (soma os dias; `0` desliga) |
 | `npm run test` | Executa os testes unitários |
 | `npm run test:e2e` | Executa os testes end-to-end |
 | `npm run lint` | Executa o linter e corrige erros automaticamente |
