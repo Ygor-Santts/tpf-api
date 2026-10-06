@@ -1,0 +1,52 @@
+# Runs the API on a server: API + MySQL + Caddy (HTTPS).
+#   docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
+# See "Servidor (produção)" in the README.
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    env_file: .env.server
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+    volumes:
+      - uploads:/usr/src/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?}
+      MYSQL_DATABASE: ${DB_DATABASE:?}
+      MYSQL_USER: ${DB_USER:?}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -p"$$MYSQL_ROOT_PASSWORD" --silent']
+      interval: 5s
+      retries: 30
+
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      DOMAIN: ${DOMAIN:?}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  db_data:
+  uploads:
+  caddy_data:
+  caddy_config:

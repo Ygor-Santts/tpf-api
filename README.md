@@ -105,6 +105,31 @@ Você pode configurar as variáveis de ambiente no arquivo `.env`.
 
 ---
 
+## 🌐 Servidor (produção)
+
+O `docker-compose.server.yml` sobe tudo num servidor com Docker: a API (compilada, sem modo dev), o MySQL (sem porta aberta para a internet) e o Caddy, que cuida do HTTPS sozinho. O banco e as fotos do portfólio ficam em volumes, então não somem quando a API é atualizada. As migrations rodam sozinhas sempre que a API sobe.
+
+```bash
+git clone https://github.com/Ygor-Santts/tpf-api.git ~/tpf-api && cd ~/tpf-api
+cp .env.server.example .env.server   # preencha domínio, senhas e JWT_SECRET
+docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
+```
+
+O domínio do `.env.server` precisa apontar para o IP do servidor (registro DNS tipo A) antes de subir, para o Caddy conseguir o certificado. Para testar no seu PC, use `DOMAIN=localhost` e abra `https://localhost/api-docs`.
+
+Comandos do dia a dia (dentro da pasta do servidor):
+
+```bash
+alias dc='docker compose --env-file .env.server -f docker-compose.server.yml'
+git pull && dc up -d --build    # atualizar para a versão mais nova
+dc logs -f api                  # ver os logs da API
+dc exec api npm run destaque -- email@x.com 30
+```
+
+Produção começa com o banco vazio (só cidades e profissões). O seed de teste é recusado com `NODE_ENV=production`.
+
+---
+
 ## 🧪 Testes
 
 Rodar os testes unitários:
