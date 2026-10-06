@@ -1,7 +1,6 @@
-# Runs the API on a server (DEV or PROD): API + MySQL + Caddy (HTTPS).
-# Each environment is its own clone of the repo with its own .env.server:
+# Runs the API on a server: API + MySQL + Caddy (HTTPS).
 #   docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
-# See "Servidor (DEV e PROD)" in the README.
+# See "Servidor (produção)" in the README.
 services:
   api:
     build: .
