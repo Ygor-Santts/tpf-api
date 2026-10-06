@@ -3,7 +3,10 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { HttpExceptionReturnInterceptor } from '@tpf/common';
+import {
+  HttpExceptionReturnInterceptor,
+  validationExceptionFactory,
+} from '@tpf/common';
 import { join } from 'path';
 import { mkdirSync } from 'fs';
 
@@ -28,6 +31,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      exceptionFactory: validationExceptionFactory,
     }),
   );
 
