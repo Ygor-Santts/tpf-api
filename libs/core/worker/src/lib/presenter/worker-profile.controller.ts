@@ -13,10 +13,11 @@ import {
   UseGuards,
   UseInterceptors,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import { join } from 'path';
 import { mkdirSync } from 'fs';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@tpf/auth';
@@ -26,6 +27,18 @@ import { IUploadPortfolioItem } from '../use-cases/upload-portfolio-item';
 import { IDeletePortfolioItem } from '../use-cases/delete-portfolio-item';
 import { IGetPortfolio } from '../use-cases/get-portfolio';
 import { UpdateWorkerProfileDTO } from './dtos/update-worker-profile.dto';
+
+// The extension comes from this list, never from the sent file name, so the API
+// only ever serves images and videos from /uploads.
+const PORTFOLIO_TYPES: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'video/mp4': '.mp4',
+  'video/quicktime': '.mov',
+  'video/webm': '.webm',
+};
+const PORTFOLIO_MAX_BYTES = 50 * 1024 * 1024;
 
 @ApiTags('Worker Profile')
 @Controller('worker')
@@ -83,9 +96,19 @@ export class WorkerProfileController {
         },
         filename: (_req, file, cb) => {
           const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-          cb(null, `${unique}${extname(file.originalname)}`);
+          cb(null, `${unique}${PORTFOLIO_TYPES[file.mimetype]}`);
         },
       }),
+      limits: { fileSize: PORTFOLIO_MAX_BYTES, files: 1 },
+      fileFilter: (_req, file, cb) => {
+        if (PORTFOLIO_TYPES[file.mimetype]) return cb(null, true);
+        cb(
+          new BadRequestException(
+            'Envie uma imagem (JPG, PNG ou WebP) ou um vídeo (MP4, MOV ou WebM).',
+          ),
+          false,
+        );
+      },
     }),
   )
   uploadPortfolioItem(
