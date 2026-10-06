@@ -5,14 +5,15 @@ import {
 } from '@nestjs/common';
 import { IUserRepository } from '../../data-access/repositories';
 import * as bcrypt from 'bcrypt';
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsBrPhone } from '@tpf/common';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterClientDTO {
-  @ApiProperty() @IsString() name: string;
+  @ApiProperty() @IsString() @IsNotEmpty() name: string;
   @ApiProperty() @IsEmail() email: string;
-  @ApiProperty() @IsString() phone: string;
-  @ApiProperty() @IsString() @MinLength(6) password: string;
+  @ApiProperty() @IsBrPhone() phone: string;
+  @ApiProperty() @IsString() @MinLength(8) password: string;
 }
 
 export abstract class IRegisterClient {

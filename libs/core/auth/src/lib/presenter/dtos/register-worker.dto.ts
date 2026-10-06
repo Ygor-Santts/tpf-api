@@ -8,8 +8,8 @@ import {
   ArrayNotEmpty,
   IsInt,
   Min,
-  IsPhoneNumber,
 } from 'class-validator';
+import { IsBrPhone } from '@tpf/common';
 
 export interface IActivateWorkerDTO {
   jobOccupationIds: number[];
@@ -53,10 +53,8 @@ export class RegisterWorkerDTO
   @IsNotEmpty()
   email!: string;
 
-  @ApiProperty({ example: '5511999999999' })
-  @IsPhoneNumber('BR')
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ example: '34999999999' })
+  @IsBrPhone()
   phone!: string;
 
   @ApiProperty({ example: 'StrongP@ssw0rd' })

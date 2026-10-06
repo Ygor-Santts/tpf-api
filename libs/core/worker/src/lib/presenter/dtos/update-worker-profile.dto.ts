@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
-import { ToNumberArray } from '@tpf/common';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
+import { IsBrPhone, ToNumberArray } from '@tpf/common';
 
 export class UpdateWorkerProfileDTO {
   @ApiProperty({ required: false })
@@ -12,11 +19,12 @@ export class UpdateWorkerProfileDTO {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
+  @IsNotEmpty()
   name?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsString()
+  @IsBrPhone()
   phone?: string;
 
   @ApiProperty({ required: false, type: [Number] })
