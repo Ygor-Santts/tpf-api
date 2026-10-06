@@ -21,7 +21,6 @@ export class GetWorkerMe implements IGetWorkerMe {
       user: {
         id: worker.user.id,
         name: worker.user.name,
-        email: worker.user.email,
         phone: worker.user.phone,
       },
       jobOccupations: worker.jobOccupations.map((o: any) => ({

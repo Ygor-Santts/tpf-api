@@ -1,4 +1,9 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { IUserRepository } from '../../data-access/repositories';
@@ -48,6 +53,9 @@ export class Login implements ILogin {
       return new NotFoundException(
         'Dados incorretos. Verifique os dados e tente novamente.',
       );
+
+    if (!user.enabled)
+      return new ForbiddenException('Esta conta está desativada.');
 
     user.loggedIn();
     await this.userRepository.save(user);

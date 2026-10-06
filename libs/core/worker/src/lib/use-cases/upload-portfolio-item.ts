@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { IPortfolioRepository } from '../data-access/repositories';
 import { IWorkerProfileRepository } from '../data-access/repositories';
 
@@ -14,6 +14,7 @@ export class UploadPortfolioItem implements IUploadPortfolioItem {
   ) {}
 
   async execute(workerId: number, file: any, caption?: string): Promise<any> {
+    if (!file) throw new BadRequestException('Selecione uma imagem ou um vídeo.');
     const worker = await this.workerRepo.findById(workerId);
     if (!worker) throw new NotFoundException('Worker não encontrado');
 
