@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { isFeatured } from '@tpf/domain';
 import { IWorkerProfileRepository } from '../data-access/repositories';
 
 export abstract class IGetWorkerMe {
@@ -16,6 +17,7 @@ export class GetWorkerMe implements IGetWorkerMe {
     return {
       id: worker.id,
       bio: worker.bio,
+      featuredUntil: isFeatured(worker) ? worker.featuredUntil : null,
       user: {
         id: worker.user.id,
         name: worker.user.name,

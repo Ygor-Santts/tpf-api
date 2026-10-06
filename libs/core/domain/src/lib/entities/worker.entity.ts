@@ -19,6 +19,7 @@ export abstract class IWorker {
   id!: number;
   user!: IUser;
   bio?: string;
+  featuredUntil?: Date;
   jobOccupations!: Collection<IJobOccupation>;
   operationCities!: Collection<City>;
 }
@@ -33,6 +34,10 @@ export class Worker implements IWorker {
 
   @Property({ nullable: true, length: 500 })
   bio?: string;
+
+  /** Paid "Destaque": shown first in search while this date is in the future. */
+  @Property({ nullable: true, fieldName: 'featured_until' })
+  featuredUntil?: Date;
 
   @ManyToMany(() => JobOccupation, undefined, {
     pivotTable: 'worker_job_occupations',
@@ -59,3 +64,6 @@ export class Worker implements IWorker {
     return new Worker(props);
   }
 }
+
+export const isFeatured = (worker: IWorker) =>
+  !!worker.featuredUntil && worker.featuredUntil > new Date();

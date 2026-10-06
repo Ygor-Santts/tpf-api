@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IGetWorkerByParametersPaginatedDTO } from '../../presenter/dtos';
 import { IWorkerRepository } from '../../data-access/repositories';
 import { IPaginationResponseDTO, PaginationResponseDTO } from '@tpf/common';
-import { IWorker } from '@tpf/domain';
+import { IWorker, isFeatured } from '@tpf/domain';
 
 export class IGetWorkersByParametersResponseDTO {
   @ApiProperty() id!: number;
@@ -13,6 +13,7 @@ export class IGetWorkersByParametersResponseDTO {
   @ApiProperty() jobCategories!: { id: number; name: string; occupations: { id: number; name: string }[] }[];
   @ApiProperty() averageRating!: number;
   @ApiProperty() ratingCount!: number;
+  @ApiProperty({ description: 'Paid Destaque is active' }) featured!: boolean;
 
   constructor(worker: IWorker, ratingSummary?: { average: number; count: number }) {
     this.id = worker.id;
@@ -34,6 +35,7 @@ export class IGetWorkersByParametersResponseDTO {
     );
     this.averageRating = ratingSummary?.average ?? 0;
     this.ratingCount = ratingSummary?.count ?? 0;
+    this.featured = isFeatured(worker);
   }
 }
 
