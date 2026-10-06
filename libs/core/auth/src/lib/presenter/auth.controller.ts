@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   ActivateWorkerDTO,
+  DeleteAccountDTO,
   ForgotPasswordDTO,
   RegisterWorkerDTO,
   ResetPasswordDTO,
@@ -22,6 +24,7 @@ import { IGenericExceptionResponseDTO } from '@tpf/common';
 import { IRegisterClient, RegisterClientDTO } from '../use-cases/services/register-client';
 import { IGetMe } from '../use-cases/services/get-me';
 import { IActivateWorker } from '../use-cases/services/activate-worker';
+import { IDeleteAccount } from '../use-cases/services/delete-account';
 import { JwtAuthGuard } from '../guards/jwt.guard';
 import {
   IForgotPassword,
@@ -39,6 +42,7 @@ export class AuthController {
     private readonly forgotPasswordUseCase: IForgotPassword,
     private readonly resetPasswordUseCase: IResetPassword,
     private readonly activateWorkerUseCase: IActivateWorker,
+    private readonly deleteAccountUseCase: IDeleteAccount,
   ) {}
 
   @Post('sign-in')
@@ -103,5 +107,16 @@ export class AuthController {
   @ApiOperation({ summary: 'Perfil do usuário autenticado' })
   getMe(@Request() req: any) {
     return this.getMeUseCase.execute(req.user.userId);
+  }
+
+  @Delete('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Exclui a conta do usuário autenticado' })
+  @ApiResponse({ status: 204, description: 'Conta excluída' })
+  @ApiResponse({ status: 403, type: IGenericExceptionResponseDTO })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteMe(@Request() req: any, @Body() body: DeleteAccountDTO) {
+    return this.deleteAccountUseCase.execute(req.user.userId, body);
   }
 }
