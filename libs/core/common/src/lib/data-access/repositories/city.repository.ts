@@ -21,6 +21,9 @@ export class CityRepository implements ICityRepository {
   }
 
   getByStateId(stateId: EStatesCode): Promise<ICity[]> {
-    return this._repository.find({ state: stateId });
+    return this._repository.find(
+      { state: stateId },
+      { orderBy: { name: 'ASC' } },
+    );
   }
 }

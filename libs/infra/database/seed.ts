@@ -25,6 +25,16 @@ const DOMAIN = '@teste.com';
 const PASSWORD = 'Teste@123';
 const UPLOADS = join(process.cwd(), 'uploads', 'portfolio');
 
+// IBGE codes of the cities test workers serve: the 20 original cities plus
+// Uberlândia and its neighbours Araguari (about 30 km) and Uberaba (about
+// 100 km), and Guarulhos and Osasco next to São Paulo, to try the region filter.
+const SEED_CITIES = [
+  3550308, 3304557, 3106200, 4106902, 4314902, 2927408, 2611606, 2304400,
+  1302603, 5300108, 1501402, 5208707, 3509502, 2111300, 2704302, 2408102,
+  2211001, 2507507, 2800308, 4205407, 3170206, 3103504, 3170107, 3518800,
+  3534401,
+];
+
 // Fixed-seed random numbers, so every run produces the same data.
 let state = 20261006;
 function random() {
@@ -190,7 +200,10 @@ async function main() {
     await db.beginTransaction();
 
     const removed = await cleanUp(db);
-    const [cities] = await db.query<Row[]>('select id from city order by id');
+    const [cities] = await db.query<Row[]>(
+      'select id from city where ibge_id in (?) order by id',
+      [SEED_CITIES],
+    );
     const [occupations] = await db.query<Row[]>(
       'select id, name from job_occupation order by id',
     );
