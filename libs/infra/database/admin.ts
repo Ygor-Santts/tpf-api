@@ -1,12 +1,12 @@
 /**
- * Gives an account access to the admin area, found by its email.
+ * Gives an account access to the admin panel (tpf-admin), found by its email.
  *
  *   npm run admin -- email@exemplo.com
  *   npm run admin -- email@exemplo.com --remover
  *
  * On the server: dc exec api npm run admin -- email@exemplo.com
  *
- * Sign out and in again in the app to see the "Admin" menu.
+ * The admin panel then accepts that account's email and password.
  */
 import * as dotenv from 'dotenv';
 dotenv.config({ path: process.cwd() + '/.env' });
@@ -40,7 +40,7 @@ async function main() {
     }
     console.log(
       admin
-        ? `${email} agora é admin. Saia e entre de novo no app.`
+        ? `${email} agora é admin e já pode entrar no painel de admin.`
         : `${email} não é mais admin.`,
     );
   } finally {

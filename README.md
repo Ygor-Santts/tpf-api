@@ -59,7 +59,7 @@ Cria 40 contas de teste (10 clientes, 25 trabalhadores e 5 que também contratam
 
 | Conta | Para testar |
 |-------|-------------|
-| `cliente01@teste.com` | Cliente comum e admin (menu "Admin") |
+| `cliente01@teste.com` | Cliente comum e admin (entra no [tpf-admin](https://github.com/Ygor-Santts/tpf-admin)) |
 | `cliente02@teste.com` a `cliente09@teste.com` | Cliente comum |
 | `cliente10@teste.com` | Conta desativada |
 | `trabalhador01@teste.com` | Trabalhador com muitas avaliações boas |
@@ -92,7 +92,7 @@ Este projeto utiliza o padrão **monorepo** com Nx. Os módulos estão organizad
 | `npm run migration:down` | Reverte a última migration |
 | `npm run seed` | Recria os dados de teste (contas `@teste.com`) |
 | `npm run destaque -- <email> <dias>` | Coloca um trabalhador em destaque (soma os dias; `0` desliga) |
-| `npm run admin -- <email>` | Dá acesso à área de admin (`--remover` tira) |
+| `npm run admin -- <email>` | Dá acesso ao painel de admin (`--remover` tira) |
 | `npm run test` | Executa os testes unitários |
 | `npm run test:e2e` | Executa os testes end-to-end |
 | `npm run lint` | Executa o linter e corrige erros automaticamente |
@@ -113,10 +113,11 @@ Tudo roda num servidor só, com Docker: a API (compilada), o MySQL (sem porta ab
 
 - App: `https://SEU_DOMINIO`
 - API: `https://api.SEU_DOMINIO` (também responde em `https://SEU_DOMINIO/api`)
+- Admin: `https://admin.SEU_DOMINIO` (repositório e deploy próprios: [tpf-admin](https://github.com/Ygor-Santts/tpf-admin))
 
 ### 1. Domínio (Registro.br)
 
-Em **DNS → Editar zona**, crie dois registros do tipo **A** com o IP do servidor: um com o nome vazio e outro com o nome `api`. Um `www` (CNAME para o domínio) é opcional: o Caddy redireciona ele para o endereço principal.
+Em **DNS → Editar zona**, crie três registros do tipo **A** com o IP do servidor: um com o nome vazio, um com o nome `api` e um com o nome `admin`. Um `www` (CNAME para o domínio) é opcional: o Caddy redireciona ele para o endereço principal.
 
 ### 2. Preparar o servidor (Ubuntu 24.04, uma vez só)
 
@@ -202,7 +203,7 @@ alias dc='docker compose --env-file .env.server -f docker-compose.server.yml'
 git pull && git -C ../tpf-app pull && dc up -d --build   # atualizar API e app
 dc logs -f api                                         # ver os logs da API
 dc exec api npm run destaque -- email@x.com 30
-dc exec api npm run admin -- seu@email.com             # abre o menu Admin no app
+dc exec api npm run admin -- seu@email.com             # dá acesso ao painel de admin
 ```
 
 Produção começa com o banco vazio (só cidades e profissões). O seed de teste é recusado com `NODE_ENV=production`.

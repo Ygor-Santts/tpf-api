@@ -24,6 +24,13 @@ api.{$DOMAIN} {
 	reverse_proxy api:3000
 }
 
+# The admin panel: its own repository (tpf-admin) and container, which joins
+# this compose network as "admin". Until it runs, this address answers 502.
+admin.{$DOMAIN} {
+	encode gzip
+	reverse_proxy admin:80
+}
+
 # Anyone who types www. lands on the main address.
 www.{$DOMAIN} {
 	redir https://{$DOMAIN}{uri} permanent

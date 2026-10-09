@@ -205,7 +205,7 @@ async function main() {
       [SEED_CITIES],
     );
     const [occupations] = await db.query<Row[]>(
-      'select id, name from job_occupation order by id',
+      'select id, name from job_occupation where approved order by id',
     );
     if (!cities.length || !occupations.length) {
       throw new Error(
