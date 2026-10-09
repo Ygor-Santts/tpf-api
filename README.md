@@ -107,26 +107,63 @@ Você pode configurar as variáveis de ambiente no arquivo `.env`.
 
 ## 🌐 Servidor (produção)
 
-O `docker-compose.server.yml` sobe tudo num servidor com Docker: a API (compilada, sem modo dev), o MySQL (sem porta aberta para a internet) e o Caddy, que cuida do HTTPS sozinho. O banco e as fotos do portfólio ficam em volumes, então não somem quando a API é atualizada. As migrations rodam sozinhas sempre que a API sobe.
+Tudo roda num servidor só, com Docker: a API (compilada), o MySQL (sem porta aberta para a internet) e o Caddy, que cuida do HTTPS sozinho e também serve a versão web do app. O banco, as fotos e os certificados ficam em volumes, então não somem quando você atualiza. As migrations rodam sozinhas sempre que a API sobe.
+
+- App: `https://SEU_DOMINIO`
+- API: `https://api.SEU_DOMINIO`
+
+### 1. Domínio (Registro.br)
+
+Em **DNS → Editar zona**, crie dois registros do tipo **A** com o IP do servidor: um com o nome vazio e outro com o nome `api`. Um `www` (CNAME para o domínio) é opcional: o Caddy redireciona ele para o endereço principal.
+
+### 2. Preparar o servidor (Ubuntu 24.04, uma vez só)
+
+Entre no servidor com `ssh root@IP_DO_SERVIDOR` e rode:
 
 ```bash
-git clone https://github.com/Ygor-Santts/tpf-api.git ~/tpf-api && cd ~/tpf-api
-cp .env.server.example .env.server   # preencha domínio, senhas e JWT_SECRET
+curl -fsSL https://get.docker.com | sh
+ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw --force enable
+
+git clone https://github.com/Ygor-Santts/tpf-api.git ~/tpf-api
+git clone https://github.com/Ygor-Santts/tpf-app.git ~/tpf-app
+cd ~/tpf-api
+cp .env.server.example .env.server
+nano .env.server   # DOMAIN, APP_URL, senhas e JWT_SECRET (openssl rand -hex 32)
+```
+
+Os repositórios são privados: o `git clone` pede seu usuário do GitHub e, como senha, um token (GitHub → Settings → Developer settings → Personal access tokens).
+
+### 3. Subir
+
+```bash
+cd ~/tpf-api
 docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
 ```
 
-O domínio do `.env.server` precisa apontar para o IP do servidor (registro DNS tipo A) antes de subir, para o Caddy conseguir o certificado. Para testar no seu PC, use `DOMAIN=localhost` e abra `https://localhost/api-docs`.
+O primeiro build demora alguns minutos. Depois abra `https://api.SEU_DOMINIO/api-docs` e `https://SEU_DOMINIO`.
 
-Comandos do dia a dia (dentro da pasta do servidor):
+### 4. Backup diário
+
+`deploy/backup.sh` salva o banco e as fotos em `~/tpf-api/backups` e guarda os últimos 7 dias. Para rodar todo dia às 3h:
+
+```bash
+(crontab -l 2>/dev/null; echo "0 3 * * * $HOME/tpf-api/deploy/backup.sh >> $HOME/tpf-api/backups/backup.log 2>&1") | crontab -
+```
+
+Para baixar uma cópia para o seu PC: `scp -r root@IP_DO_SERVIDOR:tpf-api/backups ./backups-trampofacil`.
+
+### Dia a dia (dentro de `~/tpf-api`)
 
 ```bash
 alias dc='docker compose --env-file .env.server -f docker-compose.server.yml'
-git pull && dc up -d --build    # atualizar para a versão mais nova
-dc logs -f api                  # ver os logs da API
+git pull && git -C ../tpf-app pull && dc up -d --build   # atualizar API e app
+dc logs -f api                                         # ver os logs da API
 dc exec api npm run destaque -- email@x.com 30
 ```
 
 Produção começa com o banco vazio (só cidades e profissões). O seed de teste é recusado com `NODE_ENV=production`.
+
+Para testar tudo no seu PC antes, com o `tpf-app` na pasta ao lado, use `DOMAIN=localhost` e `APP_URL=https://localhost` e abra `https://localhost` (o navegador avisa do certificado local; é só aceitar).
 
 ---
 

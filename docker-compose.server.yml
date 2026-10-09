@@ -1,4 +1,5 @@
-# Runs the API on a server: API + MySQL + Caddy (HTTPS).
+# Runs everything on one server: API + MySQL + Caddy (HTTPS), with Caddy also
+# serving the app's web version. Needs tpf-app cloned next to this repo (../tpf-app).
 #   docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
 # See "Servidor (produção)" in the README.
 services:
@@ -31,7 +32,11 @@ services:
       retries: 30
 
   caddy:
-    image: caddy:2.8
+    build:
+      context: ../tpf-app
+      dockerfile: Dockerfile.web
+      args:
+        VITE_API_URL: https://api.${DOMAIN:?}
     restart: unless-stopped
     ports:
       - '80:80'

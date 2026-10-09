@@ -1,6 +1,21 @@
-# Caddy gets and renews the HTTPS certificate for $DOMAIN by itself.
-# With DOMAIN=localhost it uses a local certificate (for testing on your PC).
+# Caddy gets and renews the HTTPS certificates by itself.
+# With DOMAIN=localhost it uses local certificates (for testing on your PC).
+
+# The app's web version (built from ../tpf-app, files in /srv).
 {$DOMAIN} {
 	encode gzip
+	root * /srv
+	# The app uses browser history routes such as /privacidade.
+	try_files {path} /index.html
+	file_server
+}
+
+api.{$DOMAIN} {
+	encode gzip
 	reverse_proxy api:3000
+}
+
+# Anyone who types www. lands on the main address.
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
 }
