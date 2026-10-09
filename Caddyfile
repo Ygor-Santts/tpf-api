@@ -4,10 +4,19 @@
 # The app's web version (built from ../tpf-app, files in /srv).
 {$DOMAIN} {
 	encode gzip
-	root * /srv
-	# The app uses browser history routes such as /privacidade.
-	try_files {path} /index.html
-	file_server
+
+	# The API also answers under /api on the main address, which is the one
+	# the app uses. api.{$DOMAIN} below keeps working too.
+	handle_path /api/* {
+		reverse_proxy api:3000
+	}
+
+	handle {
+		root * /srv
+		# The app uses browser history routes such as /privacidade.
+		try_files {path} /index.html
+		file_server
+	}
 }
 
 api.{$DOMAIN} {
