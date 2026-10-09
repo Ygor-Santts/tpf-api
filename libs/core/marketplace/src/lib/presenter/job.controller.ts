@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import {
   GetJobOccupationsByCategory,
   IGetJobOccupationsByCategoryResponseDTO,
@@ -9,6 +9,11 @@ import {
   IGetJobCategoriesResponseDTO,
 } from '../use-cases/views/get-job-categories';
 import { IGenericExceptionResponseDTO } from '@tpf/common';
+import {
+  IAddJobOccupation,
+  IAddJobOccupationResponseDTO,
+} from '../use-cases/services/add-job-occupation';
+import { AddJobOccupationDTO } from './dtos';
 
 @ApiTags('Jobs')
 @Controller('job')
@@ -16,6 +21,7 @@ export class JobController {
   constructor(
     private readonly getJobCategoriesView: GetJobCategories,
     private readonly getOccupationsByCategoryView: GetJobOccupationsByCategory,
+    private readonly addJobOccupation: IAddJobOccupation,
   ) {}
 
   @Get('categories')
@@ -43,5 +49,25 @@ export class JobController {
   })
   getOccupationsByCategory(@Param('categoryId') categoryId: number) {
     return this.getOccupationsByCategoryView.get(categoryId);
+  }
+
+  // Public on purpose: a new worker picks their occupations before the account
+  // exists, during sign-up.
+  @Post('occupations')
+  @ApiOperation({
+    summary: 'Adicionar uma ocupação (e, se preciso, uma nova categoria)',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The new occupation, or the existing one with the same name',
+    type: IAddJobOccupationResponseDTO,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Category not found',
+    type: IGenericExceptionResponseDTO,
+  })
+  addOccupation(@Body() body: AddJobOccupationDTO) {
+    return this.addJobOccupation.execute(body);
   }
 }
