@@ -177,6 +177,22 @@ O `git pull` no servidor precisa rodar sem pedir senha. Com os repositórios pú
 
 Enquanto os segredos não existirem, a compilação roda e a publicação é pulada. Para publicar sem um merge novo: **Actions → Deploy → Run workflow**.
 
+### 6. E-mail do "Esqueci minha senha" (Resend)
+
+1. Crie uma conta grátis em [resend.com](https://resend.com) e, em **Domains**, adicione o domínio.
+2. Copie os registros que o Resend mostrar para o DNS do Registro.br (não adicione registros TLSA) e espere todos ficarem verificados no Resend.
+3. Em **API Keys**, crie uma chave com permissão **Sending access** e coloque no servidor:
+
+```bash
+cd ~/tpf-api
+sed -i '/^RESEND_API_KEY=/d; /^MAIL_FROM=/d' .env.server
+echo 'RESEND_API_KEY=re_SUA_CHAVE' >> .env.server
+echo 'MAIL_FROM=Trampo Fácil <nao-responda@SEU_DOMINIO>' >> .env.server
+docker compose --env-file .env.server -f docker-compose.server.yml up -d
+```
+
+Sem a chave, o pedido de nova senha não envia nada (em produção) e só registra um aviso no log.
+
 ### Dia a dia (dentro de `~/tpf-api`)
 
 ```bash
