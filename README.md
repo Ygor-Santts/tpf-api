@@ -196,6 +196,16 @@ docker compose --env-file .env.server -f docker-compose.server.yml up -d
 
 Sem a chave, o pedido de nova senha não envia nada (em produção) e só registra um aviso no log.
 
+O mesmo envio serve a tela **Ajuda e suporte** do app. Diga qual caixa de entrada recebe as mensagens (ao responder o e-mail, a resposta vai direto para quem escreveu):
+
+```bash
+sed -i '/^SUPPORT_EMAIL=/d' .env.server
+echo 'SUPPORT_EMAIL=seu-email@exemplo.com' >> .env.server
+docker compose --env-file .env.server -f docker-compose.server.yml up -d
+```
+
+Sem `SUPPORT_EMAIL`, o formulário de suporte avisa a pessoa que não conseguiu enviar.
+
 ### Dia a dia (dentro de `~/tpf-api`)
 
 ```bash

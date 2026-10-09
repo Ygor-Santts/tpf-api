@@ -11,6 +11,10 @@ import {
   IResetPassword,
   ResetPassword,
 } from './password-reset';
+import {
+  ISendSupportMessage,
+  SendSupportMessage,
+} from './send-support-message';
 
 export const services: Provider[] = [
   { useClass: RegisterWorker, provide: IRegisterWorker },
@@ -21,4 +25,5 @@ export const services: Provider[] = [
   { useClass: ForgotPassword, provide: IForgotPassword },
   { useClass: ResetPassword, provide: IResetPassword },
   { useClass: DeleteAccount, provide: IDeleteAccount },
+  { useClass: SendSupportMessage, provide: ISendSupportMessage },
 ];
