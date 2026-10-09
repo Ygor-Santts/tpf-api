@@ -114,7 +114,7 @@ Tudo roda num servidor só, com Docker: a API (compilada), o MySQL (sem porta ab
 
 ### 1. Domínio (Registro.br)
 
-Em **DNS → Editar zona**, crie dois registros do tipo **A** com o IP do servidor: um com o nome vazio e outro com o nome `api`.
+Em **DNS → Editar zona**, crie dois registros do tipo **A** com o IP do servidor: um com o nome vazio e outro com o nome `api`. Um `www` (CNAME para o domínio) é opcional: o Caddy redireciona ele para o endereço principal.
 
 ### 2. Preparar o servidor (Ubuntu 24.04, uma vez só)
 
