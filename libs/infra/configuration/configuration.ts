@@ -17,6 +17,10 @@ export interface IConfiguration {
   app: {
     url: string;
   };
+  mail: {
+    resendApiKey: string;
+    from: string;
+  };
 }
 
 export const configuration = (): IConfiguration => ({
@@ -35,5 +39,9 @@ export const configuration = (): IConfiguration => ({
   },
   app: {
     url: process.env.APP_URL || 'http://localhost:5173',
+  },
+  mail: {
+    resendApiKey: process.env.RESEND_API_KEY,
+    from: process.env.MAIL_FROM || 'Trampo Fácil <nao-responda@localhost>',
   },
 });
