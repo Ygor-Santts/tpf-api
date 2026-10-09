@@ -12,7 +12,7 @@ export abstract class IJobCategory {
   abstract name: string;
 }
 
-@Entity({ tableName: 'job_category', readonly: true })
+@Entity({ tableName: 'job_category' })
 export class JobCategory implements IJobCategory {
   @PrimaryKey()
   readonly id!: number;

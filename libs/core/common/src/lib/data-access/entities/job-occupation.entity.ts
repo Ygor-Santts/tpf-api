@@ -7,7 +7,7 @@ export abstract class IJobOccupation {
   abstract category: IJobCategory;
 }
 
-@Entity({ tableName: 'job_occupation', readonly: true })
+@Entity({ tableName: 'job_occupation' })
 export class JobOccupation implements IJobOccupation {
   @PrimaryKey()
   readonly id!: number;
