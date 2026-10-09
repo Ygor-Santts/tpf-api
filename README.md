@@ -152,6 +152,31 @@ O primeiro build demora alguns minutos. Depois abra `https://api.SEU_DOMINIO/api
 
 Para baixar uma cópia para o seu PC: `scp -r root@IP_DO_SERVIDOR:tpf-api/backups ./backups-trampofacil`.
 
+### 5. Publicação automática
+
+Depois de configurada, todo merge na `main` (da API ou do app) é compilado no GitHub e, se compilar, o servidor se atualiza sozinho. Acompanhe na aba **Actions** de cada repositório. Configure uma vez:
+
+**No servidor** (`ssh root@IP_DO_SERVIDOR`):
+
+```bash
+# Chave só para o GitHub entrar no servidor
+ssh-keygen -t ed25519 -f ~/.ssh/github-deploy -N "" -C github-deploy
+cat ~/.ssh/github-deploy.pub >> ~/.ssh/authorized_keys
+cat ~/.ssh/github-deploy        # copie tudo, de -----BEGIN até -----END
+```
+
+O `git pull` no servidor precisa rodar sem pedir senha. Com os repositórios públicos isso já acontece; se algum ficar privado, rode `git config --global credential.helper store` e um `git pull` à mão uma vez, informando usuário e token.
+
+**No GitHub**, em cada um dos dois repositórios (**Settings → Secrets and variables → Actions → New repository secret**):
+
+| Nome | Valor |
+| --- | --- |
+| `SERVER_HOST` | IP do servidor |
+| `SERVER_USER` | `root` |
+| `SERVER_SSH_KEY` | a chave copiada acima |
+
+Enquanto os segredos não existirem, a compilação roda e a publicação é pulada. Para publicar sem um merge novo: **Actions → Deploy → Run workflow**.
+
 ### Dia a dia (dentro de `~/tpf-api`)
 
 ```bash

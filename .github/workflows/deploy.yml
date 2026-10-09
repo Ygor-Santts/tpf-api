@@ -1,0 +1,53 @@
+# Every push to main is built here and, if it builds, published on the server.
+# Needs the repository secrets SERVER_HOST, SERVER_USER and SERVER_SSH_KEY
+# (see "Publicação automática" in the README).
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push waits for the running one.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update the server
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          if [ -z "$SERVER_HOST" ]; then
+            echo "::notice::Server secrets not set yet, skipping the deploy."
+            exit 0
+          fi
+          install -m 700 -d ~/.ssh
+          echo "$SERVER_SSH_KEY" > ~/.ssh/deploy
+          chmod 600 ~/.ssh/deploy
+          ssh -i ~/.ssh/deploy -o StrictHostKeyChecking=accept-new "$SERVER_USER@$SERVER_HOST" '
+            set -e
+            export GIT_TERMINAL_PROMPT=0
+            cd ~/tpf-api
+            git pull --ff-only
+            git -C ../tpf-app pull --ff-only
+            docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
+            docker image prune -f
+          '
