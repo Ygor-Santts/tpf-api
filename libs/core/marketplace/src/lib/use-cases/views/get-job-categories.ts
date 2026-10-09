@@ -14,7 +14,7 @@ export class GetJobCategories {
 
   async get(): Promise<IGetJobCategoriesResponseDTO[]> {
     try {
-      const jobCategories = await this.jobRepository.getAll();
+      const jobCategories = await this.jobRepository.getApproved();
 
       return jobCategories.map((jobCategory) => ({
         id: jobCategory.id,

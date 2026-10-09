@@ -160,10 +160,11 @@ export class WorkerRepository implements IWorkerRepository {
     cityIds?: number[],
     eligibleWorkerIds?: number[],
   ) {
-    const whereClause: FilterQuery<IWorker> = {};
+    // A deactivated account never shows in search.
+    const whereClause: FilterQuery<IWorker> = { user: { enabled: true } };
 
     if (dto.name) {
-      whereClause.user = { name: { $like: `%${dto.name}%` } };
+      whereClause.user = { enabled: true, name: { $like: `%${dto.name}%` } };
     }
 
     if (cityIds) {

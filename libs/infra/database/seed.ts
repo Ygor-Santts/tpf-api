@@ -238,6 +238,8 @@ async function main() {
     const clients: number[] = [];
     for (let i = 1; i <= 10; i++)
       clients.push(await createUser(`cliente${pad(i)}${DOMAIN}`, i !== 10));
+    // cliente01 also opens the admin area.
+    await db.query('update user set is_admin = true where id = ?', [clients[0]]);
 
     const workers: { id: number; userId: number }[] = [];
     const both: number[] = [];

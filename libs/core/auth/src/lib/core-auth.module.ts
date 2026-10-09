@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import type { StringValue } from 'ms';
 import { User, Worker } from '@tpf/domain';
 import { JwtAuthGuard } from './guards/jwt.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 @Module({
   imports: [
@@ -25,8 +26,8 @@ import { JwtAuthGuard } from './guards/jwt.guard';
     MikroOrmModule.forFeature([Worker, User]),
     CoreCommonModule,
   ],
-  providers: [...services, ...repositories, JwtAuthGuard],
+  providers: [...services, ...repositories, JwtAuthGuard, AdminGuard],
   controllers: [...controllers],
-  exports: [JwtAuthGuard],
+  exports: [JwtAuthGuard, AdminGuard],
 })
 export class CoreAuthModule {}

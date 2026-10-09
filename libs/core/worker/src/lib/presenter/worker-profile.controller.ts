@@ -74,7 +74,7 @@ export class WorkerProfileController {
   @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Perfil público de um worker' })
   async getWorkerPublicProfile(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
-    const profile = await this.getWorkerMe.execute(id);
+    const profile = await this.getWorkerMe.execute(id, true);
     if (!req.user) delete profile.user.phone;
     return profile;
   }

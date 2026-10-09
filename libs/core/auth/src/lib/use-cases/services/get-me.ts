@@ -22,6 +22,7 @@ export class GetMe implements IGetMe {
       phone: user.phone,
       isWorker,
       workerId: user.worker?.id,
+      isAdmin: user.isAdmin,
     };
   }
 }

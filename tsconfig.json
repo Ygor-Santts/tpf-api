@@ -18,6 +18,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@tpf/admin": ["libs/core/admin/src"],
       "@tpf/analytics": ["libs/core/analytics/src"],
       "@tpf/auth": ["libs/core/auth/src"],
       "@tpf/common": ["libs/core/common/src"],

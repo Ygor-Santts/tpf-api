@@ -15,7 +15,7 @@ export class GetJobOccupationsByCategory {
   async get(
     categoryId: number,
   ): Promise<IGetJobOccupationsByCategoryResponseDTO[] | HttpException> {
-    const jobOccupations = await this.jobOccupation.getByCategoryId(categoryId);
+    const jobOccupations = await this.jobOccupation.getApprovedByCategoryId(categoryId);
 
     if (!jobOccupations.length) {
       return new NotFoundException(`Nenhuma ocupação de trabalho encontrada`);

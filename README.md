@@ -59,7 +59,8 @@ Cria 40 contas de teste (10 clientes, 25 trabalhadores e 5 que também contratam
 
 | Conta | Para testar |
 |-------|-------------|
-| `cliente01@teste.com` a `cliente09@teste.com` | Cliente comum |
+| `cliente01@teste.com` | Cliente comum e admin (menu "Admin") |
+| `cliente02@teste.com` a `cliente09@teste.com` | Cliente comum |
 | `cliente10@teste.com` | Conta desativada |
 | `trabalhador01@teste.com` | Trabalhador com muitas avaliações boas |
 | `trabalhador02@teste.com` | Trabalhador com nota baixa |
@@ -91,6 +92,7 @@ Este projeto utiliza o padrão **monorepo** com Nx. Os módulos estão organizad
 | `npm run migration:down` | Reverte a última migration |
 | `npm run seed` | Recria os dados de teste (contas `@teste.com`) |
 | `npm run destaque -- <email> <dias>` | Coloca um trabalhador em destaque (soma os dias; `0` desliga) |
+| `npm run admin -- <email>` | Dá acesso à área de admin (`--remover` tira) |
 | `npm run test` | Executa os testes unitários |
 | `npm run test:e2e` | Executa os testes end-to-end |
 | `npm run lint` | Executa o linter e corrige erros automaticamente |
@@ -200,6 +202,7 @@ alias dc='docker compose --env-file .env.server -f docker-compose.server.yml'
 git pull && git -C ../tpf-app pull && dc up -d --build   # atualizar API e app
 dc logs -f api                                         # ver os logs da API
 dc exec api npm run destaque -- email@x.com 30
+dc exec api npm run admin -- seu@email.com             # abre o menu Admin no app
 ```
 
 Produção começa com o banco vazio (só cidades e profissões). O seed de teste é recusado com `NODE_ENV=production`.

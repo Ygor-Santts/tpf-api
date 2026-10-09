@@ -30,17 +30,25 @@ export class DeleteAccount implements IDeleteAccount {
     if (!bcrypt.compareSync(dto.password, user.password))
       throw new ForbiddenException('Senha incorreta.');
 
-    const workerId = user.worker?.id;
-    await this.em.transactional(async (em) => {
-      const db = em.getConnection();
-      if (workerId) await db.execute('delete from worker where id = ?', [workerId]);
-      await db.execute('delete from user where id = ?', [userId]);
-    });
-
-    if (workerId)
-      rmSync(join(process.cwd(), 'uploads', 'portfolio', String(workerId)), {
-        recursive: true,
-        force: true,
-      });
+    await removeAccount(this.em, userId, user.worker?.id);
   }
+}
+
+/** Deletes the user, their worker profile and portfolio files. Also used by the admin area. */
+export async function removeAccount(
+  em: EntityManager,
+  userId: number,
+  workerId?: number,
+): Promise<void> {
+  await em.transactional(async (tx) => {
+    const db = tx.getConnection();
+    if (workerId) await db.execute('delete from worker where id = ?', [workerId]);
+    await db.execute('delete from user where id = ?', [userId]);
+  });
+
+  if (workerId)
+    rmSync(join(process.cwd(), 'uploads', 'portfolio', String(workerId)), {
+      recursive: true,
+      force: true,
+    });
 }
