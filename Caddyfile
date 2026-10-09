@@ -5,8 +5,8 @@
 {$DOMAIN} {
 	encode gzip
 
-	# The API also answers under /api on the main address, which is the one
-	# the app uses. api.{$DOMAIN} below keeps working too.
+	# The API also answers under /api on the main address, a fallback for
+	# when the api. subdomain is unreachable. The app uses api.{$DOMAIN}.
 	handle_path /api/* {
 		reverse_proxy api:3000
 	}

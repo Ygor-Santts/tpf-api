@@ -36,7 +36,7 @@ services:
       context: ../tpf-app
       dockerfile: Dockerfile.web
       args:
-        VITE_API_URL: https://${DOMAIN:?}/api
+        VITE_API_URL: https://api.${DOMAIN:?}
     restart: unless-stopped
     ports:
       - '80:80'
