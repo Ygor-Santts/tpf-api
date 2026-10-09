@@ -20,7 +20,7 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import { mkdirSync } from 'fs';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@tpf/auth';
+import { JwtAuthGuard, OptionalJwtAuthGuard } from '@tpf/auth';
 import { IGetWorkerMe } from '../use-cases/get-worker-me';
 import { IUpdateWorkerProfile } from '../use-cases/update-worker-profile';
 import { IUploadPortfolioItem } from '../use-cases/upload-portfolio-item';
@@ -68,10 +68,15 @@ export class WorkerProfileController {
     return this.updateProfile.execute({ workerId: req.user.workerId, ...body });
   }
 
+  // Public, so visitors can see the profile; the phone is only sent to
+  // signed-in users.
   @Get(':id/profile')
+  @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Perfil público de um worker' })
-  getWorkerPublicProfile(@Param('id', ParseIntPipe) id: number) {
-    return this.getWorkerMe.execute(id);
+  async getWorkerPublicProfile(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
+    const profile = await this.getWorkerMe.execute(id);
+    if (!req.user) delete profile.user.phone;
+    return profile;
   }
 
   @Get(':id/portfolio')
