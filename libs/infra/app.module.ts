@@ -11,6 +11,7 @@ import { CoreAuthModule } from '@tpf/auth';
 import { CoreMarketplaceModule } from '@tpf/marketplace';
 import { CoreAnalyticsModule } from '@tpf/analytics';
 import { CoreWorkerModule } from '@tpf/worker';
+import { CoreAdminModule } from '@tpf/admin';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CoreWorkerModule } from '@tpf/worker';
     CoreMarketplaceModule,
     CoreAnalyticsModule,
     CoreWorkerModule,
+    CoreAdminModule,
   ],
   controllers: [AppController],
   providers: [DatabaseHealthCheck],

@@ -56,8 +56,10 @@ export class Worker implements IWorker {
   constructor(props: ICreateWorkerEntityDTO) {
     const { user, jobOccupations, operationCities } = props;
     this.user = user;
-    this.jobOccupations = new Collection<IJobOccupation>(this, jobOccupations);
-    this.operationCities = new Collection<ICity>(this, operationCities);
+    // set() marks the items as added; passing them to new Collection() does
+    // not, and the links were never saved on sign-up.
+    this.jobOccupations.set(jobOccupations ?? []);
+    this.operationCities.set(operationCities ?? []);
   }
 
   static create(props: ICreateWorkerEntityDTO): Worker {

@@ -18,6 +18,7 @@ export class UserProfileDTO {
   @ApiProperty() phone: string;
   @ApiProperty() isWorker: boolean;
   @ApiProperty({ required: false }) workerId?: number;
+  @ApiProperty() isAdmin: boolean;
 }
 
 export class ILoginResponseDTO {
@@ -87,6 +88,7 @@ export async function createSession(
       phone: user.phone,
       isWorker,
       workerId,
+      isAdmin: user.isAdmin,
     },
   };
 }

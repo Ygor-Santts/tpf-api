@@ -65,7 +65,8 @@ export class WorkerProfileController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Editar perfil do worker' })
   updateWorkerProfile(@Request() req: any, @Body() body: UpdateWorkerProfileDTO) {
-    return this.updateProfile.execute({ workerId: req.user.workerId, ...body });
+    // workerId last, so a workerId sent in the body can't edit someone else.
+    return this.updateProfile.execute({ ...body, workerId: req.user.workerId });
   }
 
   // Public, so visitors can see the profile; the phone is only sent to
@@ -74,7 +75,7 @@ export class WorkerProfileController {
   @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Perfil público de um worker' })
   async getWorkerPublicProfile(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
-    const profile = await this.getWorkerMe.execute(id);
+    const profile = await this.getWorkerMe.execute(id, true);
     if (!req.user) delete profile.user.phone;
     return profile;
   }

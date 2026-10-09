@@ -46,8 +46,14 @@ jobs:
             set -e
             export GIT_TERMINAL_PROMPT=0
             cd ~/tpf-api
+            OLD_CADDYFILE=$(git rev-parse HEAD:Caddyfile)
             git pull --ff-only
             git -C ../tpf-app pull --ff-only
             docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
+            # Caddy only reads its config at start, and compose does not
+            # restart it when just the Caddyfile changed.
+            if [ "$OLD_CADDYFILE" != "$(git rev-parse HEAD:Caddyfile)" ]; then
+              docker compose --env-file .env.server -f docker-compose.server.yml restart caddy
+            fi
             docker image prune -f
           '

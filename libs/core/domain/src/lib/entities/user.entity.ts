@@ -18,6 +18,7 @@ export abstract class IUser {
   abstract updatedAt: Date;
   abstract lastAccess: Date;
   abstract enabled: boolean;
+  abstract isAdmin: boolean;
 
   abstract setWorker(worker: IWorker): void;
   abstract loggedIn(): void;
@@ -65,6 +66,10 @@ export class User implements IUser {
 
   @Property({ default: true })
   enabled = true;
+
+  /** Opens the admin area. Set with `npm run admin -- email`. */
+  @Property({ fieldName: 'is_admin', default: false })
+  isAdmin = false;
 
   constructor(props: ICreateUserEntityDTO) {
     const { name, password, email, phone } = props;

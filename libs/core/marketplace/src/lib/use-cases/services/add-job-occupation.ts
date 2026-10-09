@@ -25,6 +25,8 @@ export class IAddJobOccupationResponseDTO {
   categoryId!: number;
   @ApiProperty()
   categoryName!: string;
+  @ApiProperty({ description: 'Waiting for review: not in the public lists yet' })
+  pending!: boolean;
 }
 
 export abstract class IAddJobOccupation {
@@ -45,7 +47,9 @@ const sameName = (a: string, b: string) =>
 
 /**
  * A worker whose category or occupation is not in the list adds it. When the
- * name already exists, the existing one is returned instead of a copy.
+ * name already exists, the existing one is returned instead of a copy. What is
+ * new waits for an admin's review before it shows in the public lists; the
+ * worker can still pick it for their own profile right away.
  */
 @Injectable()
 export class AddJobOccupation implements IAddJobOccupation {
@@ -65,13 +69,14 @@ export class AddJobOccupation implements IAddJobOccupation {
     );
     const occupation =
       occupations.find((o) => sameName(o.name, name)) ??
-      (await this.occupationRepository.create(name, category));
+      (await this.occupationRepository.create(name, category, false));
 
     return {
       id: occupation.id,
       name: occupation.name,
       categoryId: category.id,
       categoryName: category.name,
+      pending: !occupation.approved || !category.approved,
     };
   }
 
@@ -93,7 +98,7 @@ export class AddJobOccupation implements IAddJobOccupation {
     const categories = await this.categoryRepository.getAll();
     return (
       categories.find((c) => sameName(c.name, name)) ??
-      this.categoryRepository.create(name)
+      this.categoryRepository.create(name, false)
     );
   }
 }

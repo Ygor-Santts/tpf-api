@@ -1,0 +1,20 @@
+{
+  "name": "admin",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/admin/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/core/admin",
+        "tsConfig": "libs/core/admin/tsconfig.lib.json",
+        "packageJson": "libs/core/admin/package.json",
+        "main": "libs/core/admin/src/index.ts",
+        "assets": ["libs/core/admin/*.md"]
+      }
+    }
+  }
+}

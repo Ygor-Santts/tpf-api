@@ -3,16 +3,25 @@ import { isFeatured } from '@tpf/domain';
 import { IWorkerProfileRepository } from '../data-access/repositories';
 
 export abstract class IGetWorkerMe {
-  abstract execute(workerId: number): Promise<any>;
+  /**
+   * With `publicView`, a deactivated account is not found and occupations
+   * still waiting for review are left out.
+   */
+  abstract execute(workerId: number, publicView?: boolean): Promise<any>;
 }
 
 @Injectable()
 export class GetWorkerMe implements IGetWorkerMe {
   constructor(private readonly workerRepo: IWorkerProfileRepository) {}
 
-  async execute(workerId: number): Promise<any> {
+  async execute(workerId: number, publicView = false): Promise<any> {
     const worker = await this.workerRepo.findById(workerId);
-    if (!worker) throw new NotFoundException('Worker não encontrado');
+    if (!worker || (publicView && !worker.user.enabled))
+      throw new NotFoundException('Worker não encontrado');
+
+    const occupations = worker.jobOccupations
+      .getItems()
+      .filter((o) => !publicView || (o.approved && o.category?.approved));
 
     return {
       id: worker.id,
@@ -23,9 +32,10 @@ export class GetWorkerMe implements IGetWorkerMe {
         name: worker.user.name,
         phone: worker.user.phone,
       },
-      jobOccupations: worker.jobOccupations.map((o: any) => ({
+      jobOccupations: occupations.map((o: any) => ({
         id: o.id,
         name: o.name,
+        pending: !o.approved || !o.category?.approved,
         category: { id: o.category?.id, name: o.category?.name },
       })),
       operationCities: worker.operationCities.map((c: any) => ({

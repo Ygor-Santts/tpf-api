@@ -20,7 +20,11 @@ export class IGetWorkersByParametersResponseDTO {
     this.name = worker.user.name;
     if (withContact) this.phone = worker.user.phone;
     this.operationCities = worker.operationCities.map((city) => ({ id: city.id, name: city.name }));
-    this.jobCategories = worker.jobOccupations.reduce(
+    // Occupations still waiting for review stay off the public card.
+    const approved = worker.jobOccupations
+      .getItems()
+      .filter((o) => o.approved && o.category.approved);
+    this.jobCategories = approved.reduce(
       (acc, occupation) => {
         const { category } = occupation;
         let categoryGroup = acc.find((cat) => cat.id === category.id);
