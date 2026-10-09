@@ -163,11 +163,9 @@ Depois de configurada, todo merge na `main` (da API ou do app) é compilado no G
 ssh-keygen -t ed25519 -f ~/.ssh/github-deploy -N "" -C github-deploy
 cat ~/.ssh/github-deploy.pub >> ~/.ssh/authorized_keys
 cat ~/.ssh/github-deploy        # copie tudo, de -----BEGIN até -----END
-
-# O git pull precisa funcionar sem pedir senha
-git config --global credential.helper store
-cd ~/tpf-api && git pull && git -C ../tpf-app pull   # informe usuário e token uma última vez
 ```
+
+O `git pull` no servidor precisa rodar sem pedir senha. Com os repositórios públicos isso já acontece; se algum ficar privado, rode `git config --global credential.helper store` e um `git pull` à mão uma vez, informando usuário e token.
 
 **No GitHub**, em cada um dos dois repositórios (**Settings → Secrets and variables → Actions → New repository secret**):
 
