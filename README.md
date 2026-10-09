@@ -110,11 +110,11 @@ Você pode configurar as variáveis de ambiente no arquivo `.env`.
 Tudo roda num servidor só, com Docker: a API (compilada), o MySQL (sem porta aberta para a internet) e o Caddy, que cuida do HTTPS sozinho e também serve a versão web do app. O banco, as fotos e os certificados ficam em volumes, então não somem quando você atualiza. As migrations rodam sozinhas sempre que a API sobe.
 
 - App: `https://SEU_DOMINIO`
-- API: `https://SEU_DOMINIO/api` (também responde em `https://api.SEU_DOMINIO` quando o registro `api` existe no DNS)
+- API: `https://api.SEU_DOMINIO` (também responde em `https://SEU_DOMINIO/api`)
 
 ### 1. Domínio (Registro.br)
 
-Em **DNS → Editar zona**, crie um registro do tipo **A** com o nome vazio e o IP do servidor. Um segundo, com o nome `api`, é opcional: o app usa `SEU_DOMINIO/api`. Um `www` (CNAME para o domínio) é opcional: o Caddy redireciona ele para o endereço principal.
+Em **DNS → Editar zona**, crie dois registros do tipo **A** com o IP do servidor: um com o nome vazio e outro com o nome `api`. Um `www` (CNAME para o domínio) é opcional: o Caddy redireciona ele para o endereço principal.
 
 ### 2. Preparar o servidor (Ubuntu 24.04, uma vez só)
 
