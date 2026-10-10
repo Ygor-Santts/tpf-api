@@ -19,6 +19,7 @@ export abstract class IUser {
   abstract lastAccess: Date;
   abstract enabled: boolean;
   abstract isAdmin: boolean;
+  abstract emailVerified: boolean;
 
   abstract setWorker(worker: IWorker): void;
   abstract loggedIn(): void;
@@ -70,6 +71,10 @@ export class User implements IUser {
   /** Opens the admin area. Set with `npm run admin -- email`. */
   @Property({ fieldName: 'is_admin', default: false })
   isAdmin = false;
+
+  /** Set when the person opens the confirmation link sent to their email. */
+  @Property({ fieldName: 'email_verified', default: false })
+  emailVerified = false;
 
   constructor(props: ICreateUserEntityDTO) {
     const { name, password, email, phone } = props;
