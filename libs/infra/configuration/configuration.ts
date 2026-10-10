@@ -20,6 +20,7 @@ export interface IConfiguration {
   mail: {
     resendApiKey: string;
     from: string;
+    supportTo: string;
   };
 }
 
@@ -43,5 +44,7 @@ export const configuration = (): IConfiguration => ({
   mail: {
     resendApiKey: process.env.RESEND_API_KEY,
     from: process.env.MAIL_FROM || 'Trampo Fácil <nao-responda@localhost>',
+    // Inbox that receives the messages sent from the app's support screen.
+    supportTo: process.env.SUPPORT_EMAIL,
   },
 });

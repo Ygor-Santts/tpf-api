@@ -20,6 +20,10 @@ import {
   IVerifyEmail,
   VerifyEmail,
 } from './email-verification';
+import {
+  ISendSupportMessage,
+  SendSupportMessage,
+} from './send-support-message';
 
 export const services: Provider[] = [
   { useClass: RegisterWorker, provide: IRegisterWorker },
@@ -34,4 +38,5 @@ export const services: Provider[] = [
   { useClass: SendEmailVerification, provide: ISendEmailVerification },
   { useClass: ResendEmailVerification, provide: IResendEmailVerification },
   { useClass: VerifyEmail, provide: IVerifyEmail },
+  { useClass: SendSupportMessage, provide: ISendSupportMessage },
 ];
