@@ -4,13 +4,14 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { IUserRepository } from '../../data-access/repositories';
+import { ISendEmailVerification } from './email-verification';
 import * as bcrypt from 'bcrypt';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { IsBrPhone } from '@tpf/common';
+import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsBrPhone, IsFullName } from '@tpf/common';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterClientDTO {
-  @ApiProperty() @IsString() @IsNotEmpty() name: string;
+  @ApiProperty({ example: 'Ana Souza' }) @IsFullName() name: string;
   @ApiProperty() @IsEmail() email: string;
   @ApiProperty() @IsBrPhone() phone: string;
   @ApiProperty() @IsString() @MinLength(8) password: string;
@@ -24,7 +25,10 @@ export abstract class IRegisterClient {
 export class RegisterClient implements IRegisterClient {
   private readonly saltOrRounds = 10;
 
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly sendEmailVerification: ISendEmailVerification,
+  ) {}
 
   async execute(dto: RegisterClientDTO): Promise<void | HttpException> {
     const { email, phone, password, name } = dto;
@@ -36,5 +40,6 @@ export class RegisterClient implements IRegisterClient {
     const passwordCrypted = await bcrypt.hash(password, this.saltOrRounds);
     const user = this.userRepository.create({ email, password: passwordCrypted, name, phone });
     await this.userRepository.save(user);
+    await this.sendEmailVerification.execute(user);
   }
 }

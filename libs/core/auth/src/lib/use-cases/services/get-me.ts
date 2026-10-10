@@ -19,6 +19,7 @@ export class GetMe implements IGetMe {
       id: user.id,
       name: user.name,
       email: user.email,
+      emailVerified: user.emailVerified,
       phone: user.phone,
       isWorker,
       workerId: user.worker?.id,

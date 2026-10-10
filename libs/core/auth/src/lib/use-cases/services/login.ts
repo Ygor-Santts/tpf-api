@@ -15,6 +15,7 @@ export class UserProfileDTO {
   @ApiProperty() id: number;
   @ApiProperty() name: string;
   @ApiProperty() email: string;
+  @ApiProperty() emailVerified: boolean;
   @ApiProperty() phone: string;
   @ApiProperty() isWorker: boolean;
   @ApiProperty({ required: false }) workerId?: number;
@@ -85,6 +86,7 @@ export async function createSession(
       id: user.id,
       name: user.name,
       email: user.email,
+      emailVerified: user.emailVerified,
       phone: user.phone,
       isWorker,
       workerId,
