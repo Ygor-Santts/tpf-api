@@ -11,6 +11,15 @@ import {
   IResetPassword,
   ResetPassword,
 } from './password-reset';
+import { IMailer, Mailer } from './mailer';
+import {
+  ISendEmailVerification,
+  SendEmailVerification,
+  IResendEmailVerification,
+  ResendEmailVerification,
+  IVerifyEmail,
+  VerifyEmail,
+} from './email-verification';
 import {
   ISendSupportMessage,
   SendSupportMessage,
@@ -25,5 +34,9 @@ export const services: Provider[] = [
   { useClass: ForgotPassword, provide: IForgotPassword },
   { useClass: ResetPassword, provide: IResetPassword },
   { useClass: DeleteAccount, provide: IDeleteAccount },
+  { useClass: Mailer, provide: IMailer },
+  { useClass: SendEmailVerification, provide: ISendEmailVerification },
+  { useClass: ResendEmailVerification, provide: IResendEmailVerification },
+  { useClass: VerifyEmail, provide: IVerifyEmail },
   { useClass: SendSupportMessage, provide: ISendSupportMessage },
 ];

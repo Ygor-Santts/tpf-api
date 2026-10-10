@@ -15,6 +15,7 @@ import {
   ForgotPasswordDTO,
   RegisterWorkerDTO,
   ResetPasswordDTO,
+  VerifyEmailDTO,
 } from './dtos';
 import { IRegisterWorker } from '../use-cases/services/register-worker';
 import { ILogin, ILoginResponseDTO } from '../use-cases/services/login';
@@ -30,6 +31,10 @@ import {
   IForgotPassword,
   IResetPassword,
 } from '../use-cases/services/password-reset';
+import {
+  IResendEmailVerification,
+  IVerifyEmail,
+} from '../use-cases/services/email-verification';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -43,6 +48,8 @@ export class AuthController {
     private readonly resetPasswordUseCase: IResetPassword,
     private readonly activateWorkerUseCase: IActivateWorker,
     private readonly deleteAccountUseCase: IDeleteAccount,
+    private readonly verifyEmailUseCase: IVerifyEmail,
+    private readonly resendEmailVerificationUseCase: IResendEmailVerification,
   ) {}
 
   @Post('sign-in')
@@ -99,6 +106,26 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   resetPassword(@Body() body: ResetPasswordDTO) {
     return this.resetPasswordUseCase.execute(body);
+  }
+
+  @Post('verify-email')
+  @ApiOperation({ summary: 'Confirma o e-mail a partir do link' })
+  @ApiResponse({ status: 204, description: 'E-mail confirmado' })
+  @ApiResponse({ status: 400, type: IGenericExceptionResponseDTO })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  verifyEmail(@Body() body: VerifyEmailDTO) {
+    return this.verifyEmailUseCase.execute(body);
+  }
+
+  @Post('verify-email/resend')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reenvia o link de confirmação de e-mail' })
+  @ApiResponse({ status: 204, description: 'Link enviado' })
+  @ApiResponse({ status: 400, type: IGenericExceptionResponseDTO })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  resendEmailVerification(@Request() req: any) {
+    return this.resendEmailVerificationUseCase.execute(req.user.userId);
   }
 
   @Get('me')

@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -13,6 +8,7 @@ import {
   IForgotPasswordDTO,
   IResetPasswordDTO,
 } from '../../presenter/dtos/password-reset.dto';
+import { IMailer } from './mailer';
 
 // The token is signed with the JWT secret plus the user's current password
 // hash, so it stops working as soon as the password changes. No table needed.
@@ -26,12 +22,11 @@ export abstract class IForgotPassword {
 
 @Injectable()
 export class ForgotPassword implements IForgotPassword {
-  private readonly logger = new Logger(ForgotPassword.name);
-
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly mailer: IMailer,
   ) {}
 
   // Always resolves, so the response never reveals which emails exist.
@@ -49,54 +44,19 @@ export class ForgotPassword implements IForgotPassword {
     const appUrl = this.configService.get<string>('app.url');
     const link = `${appUrl}/reset-password?token=${token}`;
 
-    const apiKey = this.configService.get<string>('mail.resendApiKey');
-    if (apiKey) {
-      // Not awaited, so the answer takes the same time for any email.
-      void this.sendEmail(apiKey, user.email, link);
-      return;
-    }
-    // No email provider: the link goes to the log, never in production.
-    if (this.configService.get<string>('env') === 'production') {
-      this.logger.warn(
-        `Password reset requested for user ${user.id}, but RESEND_API_KEY is not set.`,
-      );
-      return;
-    }
-    this.logger.log(`Password reset link for ${user.email}: ${link}`);
-  }
-
-  // Sends through Resend (resend.com). A failure is only logged, so the
-  // response stays the same whether or not the email exists.
-  private async sendEmail(apiKey: string, to: string, link: string) {
-    try {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: this.configService.get<string>('mail.from'),
-          to,
-          subject: 'Redefinir sua senha do Trampo Fácil',
-          text:
-            `Olá!\n\nRecebemos um pedido para redefinir a senha da sua conta no Trampo Fácil.\n` +
-            `Para criar uma nova senha, abra o link abaixo (ele vale por 1 hora):\n\n${link}\n\n` +
-            `Se não foi você, pode ignorar este e-mail. Sua senha continua a mesma.`,
-          html:
-            `<p>Olá!</p><p>Recebemos um pedido para redefinir a senha da sua conta no Trampo Fácil.</p>` +
-            `<p><a href="${link}">Criar uma nova senha</a></p>` +
-            `<p>O link vale por 1 hora. Se não foi você, pode ignorar este e-mail. Sua senha continua a mesma.</p>`,
-        }),
-      });
-      if (!res.ok) {
-        this.logger.error(
-          `Resend refused the reset email (${res.status}): ${await res.text()}`,
-        );
-      }
-    } catch (error) {
-      this.logger.error(`Could not reach Resend: ${error}`);
-    }
+    this.mailer.send({
+      to: user.email,
+      link,
+      subject: 'Redefinir sua senha do Trampo Fácil',
+      text:
+        `Olá!\n\nRecebemos um pedido para redefinir a senha da sua conta no Trampo Fácil.\n` +
+        `Para criar uma nova senha, abra o link abaixo (ele vale por 1 hora):\n\n${link}\n\n` +
+        `Se não foi você, pode ignorar este e-mail. Sua senha continua a mesma.`,
+      html:
+        `<p>Olá!</p><p>Recebemos um pedido para redefinir a senha da sua conta no Trampo Fácil.</p>` +
+        `<p><a href="${link}">Criar uma nova senha</a></p>` +
+        `<p>O link vale por 1 hora. Se não foi você, pode ignorar este e-mail. Sua senha continua a mesma.</p>`,
+    });
   }
 }
 

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { IActivateWorkerDTO, IRegisterWorkerDTO } from '../../presenter/dtos';
 import { IUserRepository } from '../../data-access/repositories';
+import { ISendEmailVerification } from './email-verification';
 import { IWorkerRepository } from '../../data-access/repositories/worker.repository';
 import { ICityRepository, IJobOccupationRepository } from '@tpf/common';
 import * as bcrypt from 'bcrypt';
@@ -23,6 +24,7 @@ export class RegisterWorker implements IRegisterWorker {
     private readonly workerRepository: IWorkerRepository,
     private readonly jobOccupationRepository: IJobOccupationRepository,
     private readonly cityRepository: ICityRepository,
+    private readonly sendEmailVerification: ISendEmailVerification,
   ) {}
 
   async execute(dto: IRegisterWorkerDTO): Promise<void | HttpException> {
@@ -62,6 +64,7 @@ export class RegisterWorker implements IRegisterWorker {
     user.setWorker(worker);
 
     await this.userRepository.saveWorkerUser(user, worker);
+    await this.sendEmailVerification.execute(user);
   }
 }
 

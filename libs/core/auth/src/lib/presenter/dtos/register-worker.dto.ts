@@ -9,7 +9,7 @@ import {
   IsInt,
   Min,
 } from 'class-validator';
-import { IsBrPhone } from '@tpf/common';
+import { IsBrPhone, IsFullName } from '@tpf/common';
 
 export interface IActivateWorkerDTO {
   jobOccupationIds: number[];
@@ -43,9 +43,8 @@ export class RegisterWorkerDTO
   extends ActivateWorkerDTO
   implements IRegisterWorkerDTO
 {
-  @ApiProperty({ example: 'John Doe' })
-  @IsString()
-  @IsNotEmpty()
+  @ApiProperty({ example: 'Ana Souza' })
+  @IsFullName()
   name!: string;
 
   @ApiProperty({ example: 'johndoe@example.com' })

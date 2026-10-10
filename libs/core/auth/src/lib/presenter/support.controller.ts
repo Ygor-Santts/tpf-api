@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -18,6 +19,13 @@ import { JwtPayload } from '../guards/jwt.guard';
 @Controller('support')
 export class SupportController {
   constructor(private readonly sendSupportMessage: ISendSupportMessage) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Diz se o formulário de suporte pode enviar' })
+  @ApiResponse({ status: 200, description: '{ available: boolean }' })
+  status() {
+    return { available: this.sendSupportMessage.isAvailable() };
+  }
 
   @Post()
   @UseGuards(OptionalJwtAuthGuard)

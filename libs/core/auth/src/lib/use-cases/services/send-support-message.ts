@@ -18,6 +18,9 @@ export interface ISupportSender {
 }
 
 export abstract class ISendSupportMessage {
+  // False while the server has nowhere to send messages, so the app can
+  // hide its form instead of letting people type a message that fails.
+  abstract isAvailable(): boolean;
   abstract execute(
     dto: ISupportMessageDTO,
     ip: string,
@@ -36,6 +39,14 @@ export class SendSupportMessage implements ISendSupportMessage {
   private readonly sent = new Map<string, number[]>();
 
   constructor(private readonly configService: ConfigService) {}
+
+  isAvailable(): boolean {
+    if (this.configService.get<string>('env') !== 'production') return true;
+    return Boolean(
+      this.configService.get<string>('mail.resendApiKey') &&
+      this.configService.get<string>('mail.supportTo'),
+    );
+  }
 
   async execute(
     dto: ISupportMessageDTO,
