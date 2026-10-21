@@ -45,6 +45,8 @@ export const configuration = (): IConfiguration => ({
     resendApiKey: process.env.RESEND_API_KEY,
     from: process.env.MAIL_FROM || 'Trampo Fácil <nao-responda@localhost>',
     // Inbox that receives the messages sent from the app's support screen.
-    supportTo: process.env.SUPPORT_EMAIL,
+    // The default is a placeholder that no mailbox receives yet; every
+    // message also goes to the log, so none is lost until it is replaced.
+    supportTo: process.env.SUPPORT_EMAIL || 'suporte@app-trampofacil.com.br',
   },
 });
