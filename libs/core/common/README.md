@@ -1,11 +1,5 @@
 # common
 
-This library was generated with [Nx](https://nx.dev).
+Código compartilhado pelas outras bibliotecas: entidades de cidade, categoria e profissão, enums (ambiente e estados), validações (telefone, senha, nome) e utilidades.
 
-## Building
-
-Run `nx build common` to build the library.
-
-## Running unit tests
-
-Run `nx test common` to execute the unit tests via [Jest](https://jestjs.io).
+Visão geral do sistema: [docs/ARQUITETURA.md](../../../docs/ARQUITETURA.md).

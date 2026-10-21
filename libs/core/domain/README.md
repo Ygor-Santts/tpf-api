@@ -1,11 +1,5 @@
-# marketplace
+# domain
 
-This library was generated with [Nx](https://nx.dev).
+Entidades principais do negócio: `User` (conta), `Worker` (perfil de trabalhador, com profissões, cidades e Destaque), `PortfolioItem` (foto ou vídeo do portfólio) e `Rating` (avaliação).
 
-## Building
-
-Run `nx build marketplace` to build the library.
-
-## Running unit tests
-
-Run `nx test marketplace` to execute the unit tests via [Jest](https://jestjs.io).
+Visão geral do sistema: [docs/ARQUITETURA.md](../../../docs/ARQUITETURA.md).
