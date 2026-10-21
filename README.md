@@ -204,7 +204,7 @@ echo 'SUPPORT_EMAIL=seu-email@exemplo.com' >> .env.server
 docker compose --env-file .env.server -f docker-compose.server.yml up -d
 ```
 
-Sem `SUPPORT_EMAIL`, o formulário de suporte avisa a pessoa que não conseguiu enviar.
+Sem `SUPPORT_EMAIL`, as mensagens vão para `suporte@app-trampofacil.com.br`, um endereço provisório que ainda não tem caixa de entrada. Toda mensagem também fica no log da API: `dc logs api | grep -A12 "Support message"`.
 
 ### Dia a dia (dentro de `~/tpf-api`)
 

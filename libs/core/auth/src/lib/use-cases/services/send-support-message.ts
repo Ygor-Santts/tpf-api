@@ -67,6 +67,8 @@ export class SendSupportMessage implements ISendSupportMessage {
 
     const apiKey = this.configService.get<string>('mail.resendApiKey');
     const to = this.configService.get<string>('mail.supportTo');
+    // Kept in the log too, while the support inbox may still be a placeholder.
+    this.logger.log(`Support message for ${to}:\n${text}`);
     if (!apiKey || !to) {
       if (this.configService.get<string>('env') === 'production') {
         this.logger.warn(
@@ -76,7 +78,6 @@ export class SendSupportMessage implements ISendSupportMessage {
           'Não foi possível enviar sua mensagem agora. Tente de novo mais tarde.',
         );
       }
-      this.logger.log(`Support message (not sent, no email set up):\n${text}`);
       return;
     }
 
