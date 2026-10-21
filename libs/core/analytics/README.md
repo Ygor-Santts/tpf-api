@@ -1,11 +1,5 @@
 # analytics
 
-This library was generated with [Nx](https://nx.dev).
+Reservado para métricas de uso. Ainda vazio: o módulo existe, mas não tem rotas nem serviços.
 
-## Building
-
-Run `nx build analytics` to build the library.
-
-## Running unit tests
-
-Run `nx test analytics` to execute the unit tests via [Jest](https://jestjs.io).
+Visão geral do sistema: [docs/ARQUITETURA.md](../../../docs/ARQUITETURA.md).

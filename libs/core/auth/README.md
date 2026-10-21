@@ -1,11 +1,9 @@
 # auth
 
-This library was generated with [Nx](https://nx.dev).
+Contas e acesso.
 
-## Building
+- Rotas `auth`: login, cadastro de cliente e de trabalhador, cliente que vira trabalhador (`worker/activate`), esqueci e redefinir senha, confirmação de e-mail, `GET/DELETE me`.
+- Rota `support`: mensagens da tela "Ajuda e suporte" do app, enviadas por e-mail (Resend) para `SUPPORT_EMAIL`.
+- Guardas usadas pelas outras bibliotecas: `JwtAuthGuard` (precisa estar logado), `OptionalJwtAuthGuard` (login opcional) e `AdminGuard` (só admin, conferido no banco).
 
-Run `nx build auth` to build the library.
-
-## Running unit tests
-
-Run `nx test auth` to execute the unit tests via [Jest](https://jestjs.io).
+Visão geral do sistema: [docs/ARQUITETURA.md](../../../docs/ARQUITETURA.md).
