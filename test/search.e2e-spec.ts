@@ -42,11 +42,13 @@ describe('search ignores occupations and categories still under review', () => {
     await api.sql('delete from job_category where id = ?', [pendingCategoryId]);
   });
 
+  // The search answers 404 when nobody matches.
   const search = async (query: string) => {
     const res = await api
       .http()
-      .get(`/worker/paginated?page=1&limit=50&name=Buscapendente&${query}`)
-      .expect(200);
+      .get(`/worker/paginated?page=1&limit=50&name=Buscapendente&${query}`);
+    if (res.status === 404) return [];
+    expect(res.status).toBe(200);
     return res.body.data.map((w: { id: number }) => w.id);
   };
 
