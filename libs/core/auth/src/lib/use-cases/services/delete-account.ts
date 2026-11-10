@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { EntityManager } from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/mysql';
 import * as bcrypt from 'bcrypt';
 import { rmSync } from 'fs';
 import { join } from 'path';
@@ -40,10 +40,12 @@ export async function removeAccount(
   userId: number,
   workerId?: number,
 ): Promise<void> {
+  // tx.execute runs inside the transaction; tx.getConnection().execute would
+  // not, and a failure halfway could leave a user without their worker.
   await em.transactional(async (tx) => {
-    const db = tx.getConnection();
-    if (workerId) await db.execute('delete from worker where id = ?', [workerId]);
-    await db.execute('delete from user where id = ?', [userId]);
+    if (workerId)
+      await tx.execute('delete from worker where id = ?', [workerId]);
+    await tx.execute('delete from user where id = ?', [userId]);
   });
 
   if (workerId)
