@@ -17,6 +17,7 @@ import { JwtAuthGuard } from '@tpf/auth';
 import { ICreateRating } from '../use-cases/create-rating';
 import { IGetRatings } from '../use-cases/get-ratings';
 import { IGetRatingSummary } from '../use-cases/get-rating-summary';
+import { EnabledWorkerGuard } from './enabled-worker.guard';
 import { CreateRatingDTO } from './dtos/create-rating.dto';
 
 @ApiTags('Ratings')
@@ -29,6 +30,7 @@ export class RatingController {
   ) {}
 
   @Get(':id/ratings')
+  @UseGuards(EnabledWorkerGuard)
   @ApiOperation({ summary: 'Avaliações de um worker' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -45,6 +47,7 @@ export class RatingController {
   }
 
   @Get(':id/rating-summary')
+  @UseGuards(EnabledWorkerGuard)
   @ApiOperation({ summary: 'Resumo de avaliações de um worker' })
   getWorkerRatingSummary(@Param('id', ParseIntPipe) id: number) {
     return this.getRatingSummary.execute(id);
