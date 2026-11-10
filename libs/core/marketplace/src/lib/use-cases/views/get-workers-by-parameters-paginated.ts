@@ -8,7 +8,7 @@ import { IWorker, isFeatured } from '@tpf/domain';
 export class IGetWorkersByParametersResponseDTO {
   @ApiProperty() id!: number;
   @ApiProperty() name!: string;
-  @ApiProperty({ required: false, description: 'Only for signed-in users' }) phone?: string;
+  @ApiProperty({ required: false, description: 'Only for signed-in users with a confirmed email' }) phone?: string;
   @ApiProperty() operationCities!: { id: number; name: string }[];
   @ApiProperty() jobCategories!: { id: number; name: string; occupations: { id: number; name: string }[] }[];
   @ApiProperty() averageRating!: number;

@@ -1,0 +1,47 @@
+# Runs the e2e tests against a throwaway MySQL on every pull request and on
+# main. Independent from the deploy: a red run does not stop a publish.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: tpf
+          MYSQL_USER: tpf
+          MYSQL_PASSWORD: tpf
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot --silent"
+          --health-interval=5s
+          --health-retries=30
+    env:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: tpf
+      DB_DATABASE: tpf
+      DB_USER: tpf
+      DB_PASSWORD: tpf
+      DB_ROOT_PASSWORD: root
+      JWT_SECRET: e2e-only-secret
+      JWT_EXPIRATION: 1h
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run migration:up
+      - run: npm run test:e2e

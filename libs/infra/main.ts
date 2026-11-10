@@ -2,21 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
-import {
-  HttpExceptionReturnInterceptor,
-  validationExceptionFactory,
-} from '@tpf/common';
-import { join } from 'path';
-import { mkdirSync } from 'fs';
+import { configureApp } from './configure-app';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  const uploadsDir = join(process.cwd(), 'uploads');
-  mkdirSync(uploadsDir, { recursive: true });
-  app.useStaticAssets(uploadsDir, { prefix: '/uploads' });
-  app.enableCors();
+  configureApp(app);
 
   const config = new DocumentBuilder()
     .setTitle('TPF API')
@@ -26,14 +17,6 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, documentFactory);
-
-  app.useGlobalInterceptors(new HttpExceptionReturnInterceptor());
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      exceptionFactory: validationExceptionFactory,
-    }),
-  );
 
   const PORT = process.env.PORT || 3000;
   await app.listen(PORT, () => {

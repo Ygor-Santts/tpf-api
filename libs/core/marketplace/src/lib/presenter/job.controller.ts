@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import {
   GetJobOccupationsByCategory,
   IGetJobOccupationsByCategoryResponseDTO,
@@ -8,7 +16,11 @@ import {
   GetJobCategories,
   IGetJobCategoriesResponseDTO,
 } from '../use-cases/views/get-job-categories';
-import { IGenericExceptionResponseDTO } from '@tpf/common';
+import {
+  IGenericExceptionResponseDTO,
+  RateLimit,
+  RateLimitGuard,
+} from '@tpf/common';
 import {
   IAddJobOccupation,
   IAddJobOccupationResponseDTO,
@@ -47,13 +59,23 @@ export class JobController {
     description: 'Occupations not found',
     type: IGenericExceptionResponseDTO,
   })
-  getOccupationsByCategory(@Param('categoryId') categoryId: number) {
+  getOccupationsByCategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ) {
     return this.getOccupationsByCategoryView.get(categoryId);
   }
 
   // Public on purpose: a new worker picks their occupations before the account
-  // exists, during sign-up.
+  // exists, during sign-up. Limited per address, so nobody floods the admin's
+  // review list.
   @Post('occupations')
+  @UseGuards(RateLimitGuard)
+  @RateLimit({
+    name: 'add-occupation',
+    limit: 20,
+    windowMs: 60 * 60 * 1000,
+    message: 'Muitas profissões adicionadas. Tente de novo mais tarde.',
+  })
   @ApiOperation({
     summary: 'Adicionar uma ocupação (e, se preciso, uma nova categoria)',
   })
@@ -62,6 +84,7 @@ export class JobController {
     description: 'The new occupation, or the existing one with the same name',
     type: IAddJobOccupationResponseDTO,
   })
+  @ApiResponse({ status: 429, type: IGenericExceptionResponseDTO })
   @ApiResponse({
     status: 404,
     description: 'Category not found',

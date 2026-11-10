@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -36,7 +37,11 @@ export class RatingController {
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ) {
-    return this.getRatings.execute(id, Number(page), Number(limit));
+    return this.getRatings.execute(
+      id,
+      clamp(page, 1, Number.MAX_SAFE_INTEGER, 1),
+      clamp(limit, 1, 50, 10),
+    );
   }
 
   @Get(':id/rating-summary')
@@ -55,6 +60,18 @@ export class RatingController {
     @Request() req: any,
     @Body() body: CreateRatingDTO,
   ) {
+    // A confirmed email makes fake accounts for fake reviews harder.
+    if (!req.user.emailVerified)
+      throw new ForbiddenException(
+        'Confirme seu e-mail para avaliar. O link está no e-mail que enviamos no cadastro.',
+      );
     return this.createRating.execute(workerId, req.user.userId, body.score, body.comment);
   }
+}
+
+// Whole number within [min, max]; anything else in the query gets the fallback.
+function clamp(value: unknown, min: number, max: number, fallback: number) {
+  const n = Number(value);
+  if (!Number.isInteger(n)) return fallback;
+  return Math.min(Math.max(n, min), max);
 }

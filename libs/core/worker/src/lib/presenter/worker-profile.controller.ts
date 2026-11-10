@@ -14,6 +14,7 @@ import {
   UseInterceptors,
   Delete,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -69,14 +70,14 @@ export class WorkerProfileController {
     return this.updateProfile.execute({ ...body, workerId: req.user.workerId });
   }
 
-  // Public, so visitors can see the profile; the phone is only sent to
-  // signed-in users.
+  // Public, so visitors can see the profile. The phone is only sent to
+  // signed-in users who confirmed their email.
   @Get(':id/profile')
   @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Perfil público de um worker' })
   async getWorkerPublicProfile(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
     const profile = await this.getWorkerMe.execute(id, true);
-    if (!req.user) delete profile.user.phone;
+    if (!req.user?.emailVerified) delete profile.user.phone;
     return profile;
   }
 
@@ -95,7 +96,16 @@ export class WorkerProfileController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (req: any, _file, cb) => {
+          // Checked before anything is written, so an account without a
+          // worker profile can't leave files on the server.
           const workerId = req.user?.workerId;
+          if (!workerId)
+            return cb(
+              new ForbiddenException(
+                'Só quem tem perfil de trabalhador pode enviar ao portfólio.',
+              ),
+              '',
+            );
           const dir = join(process.cwd(), 'uploads', 'portfolio', String(workerId));
           mkdirSync(dir, { recursive: true });
           cb(null, dir);

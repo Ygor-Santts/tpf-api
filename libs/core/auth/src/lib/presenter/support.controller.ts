@@ -9,11 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { IGenericExceptionResponseDTO } from '@tpf/common';
+import { clientIp, IGenericExceptionResponseDTO } from '@tpf/common';
 import { SupportMessageDTO } from './dtos';
 import { ISendSupportMessage } from '../use-cases/services/send-support-message';
 import { OptionalJwtAuthGuard } from '../guards/optional-jwt.guard';
-import { JwtPayload } from '../guards/jwt.guard';
+import { SessionUser } from '../guards/jwt.guard';
 
 @ApiTags('Support')
 @Controller('support')
@@ -35,18 +35,11 @@ export class SupportController {
   @ApiResponse({ status: 503, type: IGenericExceptionResponseDTO })
   @HttpCode(HttpStatus.NO_CONTENT)
   send(@Request() req: any, @Body() body: SupportMessageDTO) {
-    const user = req.user as JwtPayload | undefined;
+    const user = req.user as SessionUser | undefined;
     return this.sendSupportMessage.execute(
       body,
       clientIp(req),
       user ? { userId: user.userId, isWorker: user.isWorker } : undefined,
     );
   }
-}
-
-// Behind Caddy the socket address is Caddy's. Caddy replaces any
-// X-Forwarded-For a client sends, so its last entry is the real address.
-function clientIp(req: any): string {
-  const forwarded = String(req.headers['x-forwarded-for'] ?? '');
-  return forwarded.split(',').pop()?.trim() || req.ip || 'unknown';
 }

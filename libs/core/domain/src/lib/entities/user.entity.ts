@@ -20,6 +20,7 @@ export abstract class IUser {
   abstract enabled: boolean;
   abstract isAdmin: boolean;
   abstract emailVerified: boolean;
+  abstract tokenVersion: number;
 
   abstract setWorker(worker: IWorker): void;
   abstract loggedIn(): void;
@@ -75,6 +76,10 @@ export class User implements IUser {
   /** Set when the person opens the confirmation link sent to their email. */
   @Property({ fieldName: 'email_verified', default: false })
   emailVerified = false;
+
+  /** Goes up when the password changes, so older logins stop working. */
+  @Property({ fieldName: 'token_version', default: 0 })
+  tokenVersion = 0;
 
   constructor(props: ICreateUserEntityDTO) {
     const { name, password, email, phone } = props;
