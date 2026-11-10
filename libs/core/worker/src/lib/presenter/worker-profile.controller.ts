@@ -28,6 +28,7 @@ import { IUploadPortfolioItem } from '../use-cases/upload-portfolio-item';
 import { IDeletePortfolioItem } from '../use-cases/delete-portfolio-item';
 import { IGetPortfolio } from '../use-cases/get-portfolio';
 import { UpdateWorkerProfileDTO } from './dtos/update-worker-profile.dto';
+import { EnabledWorkerGuard } from './enabled-worker.guard';
 
 // The extension comes from this list, never from the sent file name, so the API
 // only ever serves images and videos from /uploads.
@@ -82,6 +83,7 @@ export class WorkerProfileController {
   }
 
   @Get(':id/portfolio')
+  @UseGuards(EnabledWorkerGuard)
   @ApiOperation({ summary: 'Portfólio público de um worker' })
   getWorkerPortfolio(@Param('id', ParseIntPipe) id: number) {
     return this.getPortfolio.execute(id);
