@@ -1,11 +1,9 @@
 # marketplace
 
-This library was generated with [Nx](https://nx.dev).
+Tudo o que o cliente usa para encontrar um profissional.
 
-## Building
+- Rota `worker/paginated`: busca por nome, profissão, categoria, cidade ou raio (latitude, longitude e km). Quem tem Destaque ativo vem primeiro; `sort=best` mostra só quem tem 3 ou mais avaliações, pela nota. O telefone só vai para quem está logado.
+- Rotas `job`: categorias, profissões de uma categoria e sugestão de profissão nova (fica em análise até um admin aprovar).
+- Rotas `locales`: estados e cidades.
 
-Run `nx build marketplace` to build the library.
-
-## Running unit tests
-
-Run `nx test marketplace` to execute the unit tests via [Jest](https://jestjs.io).
+Visão geral do sistema: [docs/ARQUITETURA.md](../../../docs/ARQUITETURA.md).

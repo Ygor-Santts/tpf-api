@@ -2,6 +2,10 @@
 
 Este é o repositório backend do projeto **Trampo Fácil**, construído com [NestJS](https://nestjs.com/), [MikroORM](https://mikro-orm.io/), [MySQL](https://www.mysql.com/), [Nx](https://nx.dev/) e [Docker](https://www.docker.com/).
 
+É a API usada pelo app ([tpf-app](https://github.com/Ygor-Santts/tpf-app)) e pelo painel de administração ([tpf-admin](https://github.com/Ygor-Santts/tpf-admin)). Este repositório também guarda a configuração do servidor de produção, que roda os três.
+
+📘 **Visão geral do sistema** (repositórios, servidor, regras de negócio, dados, rotas e pendências): [docs/ARQUITETURA.md](docs/ARQUITETURA.md)
+
 ## 🧱 Tecnologias Principais
 
 - [NestJS](https://nestjs.com/) — Framework Node.js moderno e escalável
@@ -17,7 +21,7 @@ Este é o repositório backend do projeto **Trampo Fácil**, construído com [Ne
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/Trampo-Facil/tpf-api
+git clone https://github.com/Ygor-Santts/tpf-api
 cd tpf-api
 ```
 
@@ -29,7 +33,21 @@ npm install
 
 ### 3. Configure as variáveis de ambiente
 
-Crie o arquivo `.env` com suas configurações locais.
+Crie o arquivo `.env` com suas configurações locais:
+
+| Variável | Para quê | Exemplo |
+| --- | --- | --- |
+| `NODE_ENV` | Ambiente | `development` |
+| `PORT` | Porta da API | `3000` |
+| `DB_HOST` / `DB_PORT` | Endereço do MySQL | `tpf_db` / `3306` |
+| `DB_NAME` e `DB_DATABASE` | Nome do banco (os dois com o mesmo valor) | `tpf` |
+| `DB_USER` / `DB_PASSWORD` / `DB_ROOT_PASSWORD` | Usuário e senhas do MySQL | |
+| `JWT_SECRET` / `JWT_EXPIRATION` | Assinatura e validade do login | `openssl rand -hex 32` / `7d` |
+| `APP_URL` | Endereço do app, usado nos links dos e-mails | `http://localhost:5173` |
+| `RESEND_API_KEY` / `MAIL_FROM` | Envio de e-mails (opcional no seu PC: sem a chave, o link sai no log) | |
+| `SUPPORT_EMAIL` | Caixa que recebe as mensagens da tela de suporte (opcional) | |
+
+As variáveis de produção estão comentadas em `.env.server.example`.
 
 ### 4. Inicie o Docker
 
@@ -75,7 +93,22 @@ Pode rodar de novo quando quiser: ele apaga só as contas `@teste.com` e recria 
 
 ## 📂 Estrutura do projeto
 
-Este projeto utiliza o padrão **monorepo** com Nx. Os módulos estão organizados em `libs/`, separados por contexto (ex: aplicação, infraestrutura, etc).
+Este projeto utiliza o padrão **monorepo** com Nx. Cada contexto é uma biblioteca em `libs/core`, dividida em `presenter` (controllers e DTOs), `use-cases` (regras de negócio) e `data-access` (repositórios).
+
+| Pasta | O que tem |
+| --- | --- |
+| `libs/core/auth` | Login, cadastro de cliente e de trabalhador, confirmação de e-mail, senha, excluir conta, suporte e as guardas (`JwtAuthGuard`, `OptionalJwtAuthGuard`, `AdminGuard`) |
+| `libs/core/marketplace` | Busca de trabalhadores (região, Destaque, Melhores no ramo), categorias, profissões, estados e cidades |
+| `libs/core/worker` | Perfil do trabalhador, portfólio (upload de fotos e vídeos) e avaliações |
+| `libs/core/admin` | Rotas do painel de administração: categorias, profissões e usuários |
+| `libs/core/domain` | Entidades principais: usuário, trabalhador, item de portfólio e avaliação |
+| `libs/core/common` | Entidades de cidade, categoria e profissão, enums, validações e utilidades |
+| `libs/core/analytics` | Reservado para métricas (ainda vazio) |
+| `libs/infra` | Módulo principal (`main.ts`), configuração, banco (migrations, seed e comandos) e health-check |
+| `deploy/` | Script de backup |
+| `test/` | Configuração dos testes e2e |
+
+As rotas ficam documentadas no Swagger, em `/api-docs` (por exemplo `http://localhost:3000/api-docs`).
 
 ---
 
@@ -223,6 +256,8 @@ Para testar tudo no seu PC antes, com o `tpf-app` na pasta ao lado, use `DOMAIN=
 ---
 
 ## 🧪 Testes
+
+> **Situação atual:** o Jest está configurado, mas ainda não há testes escritos. O único teste e2e (`test/app.e2e-spec.ts`) é o exemplo que veio com o NestJS e espera uma rota `/` que não existe mais. Escrever a suíte é um dos próximos passos.
 
 Rodar os testes unitários:
 
