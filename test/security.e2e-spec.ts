@@ -115,14 +115,17 @@ describe('A1: a login stops working when the account changes', () => {
   });
 
   it('treats a deactivated account as a visitor on public routes', async () => {
+    // Its own worker, so the search has a result even on an empty database.
+    await api.signUp({ worker: true, name: 'Zelia Desativadoteste' });
     const client = await api.signUp({ verified: true });
     await api.sql('update user set enabled = false where id = ?', [client.id]);
     const res = await api
       .http()
-      .get('/worker/paginated?page=1&limit=5')
+      .get('/worker/paginated?page=1&limit=5&name=Desativadoteste')
       .set('Authorization', bearer(client))
       .expect(200);
-    expect(res.body.data.some((w: any) => 'phone' in w)).toBe(false);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].phone).toBeUndefined();
   });
 });
 
@@ -141,6 +144,8 @@ describe('A2: portfolio uploads leave no stray files', () => {
 
   it('deletes a file whose content is not what it claims', async () => {
     const worker = await api.signUp({ worker: true });
+    const dir = join(UPLOADS, String(worker.workerId));
+    const before = filesIn(dir);
     await api
       .http()
       .post('/worker/portfolio')
@@ -150,11 +155,13 @@ describe('A2: portfolio uploads leave no stray files', () => {
         contentType: 'image/png',
       })
       .expect(400);
-    expect(filesIn(join(UPLOADS, String(worker.workerId)))).toBe(0);
+    expect(filesIn(dir)).toBe(before);
   });
 
   it('deletes the file when the caption is too long', async () => {
     const worker = await api.signUp({ worker: true });
+    const dir = join(UPLOADS, String(worker.workerId));
+    const before = filesIn(dir);
     await api
       .http()
       .post('/worker/portfolio')
@@ -162,11 +169,12 @@ describe('A2: portfolio uploads leave no stray files', () => {
       .field('caption', 'c'.repeat(201))
       .attach('file', PNG, { filename: 'a.png', contentType: 'image/png' })
       .expect(400);
-    expect(filesIn(join(UPLOADS, String(worker.workerId)))).toBe(0);
+    expect(filesIn(dir)).toBe(before);
   });
 
   it('saves a real image and refuses more than 30 items', async () => {
     const worker = await api.signUp({ worker: true });
+    const before = filesIn(join(UPLOADS, String(worker.workerId)));
     const upload = () =>
       api
         .http()
@@ -183,7 +191,7 @@ describe('A2: portfolio uploads leave no stray files', () => {
         [worker.workerId],
       );
     await upload().expect(400);
-    expect(filesIn(join(UPLOADS, String(worker.workerId)))).toBe(1);
+    expect(filesIn(join(UPLOADS, String(worker.workerId)))).toBe(before + 1);
   });
 });
 
