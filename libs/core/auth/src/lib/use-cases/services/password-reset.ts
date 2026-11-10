@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { IUser } from '@tpf/domain';
+import { RateLimiter } from '@tpf/common';
 import { IUserRepository } from '../../data-access/repositories';
 import {
   IForgotPasswordDTO,
@@ -22,6 +23,9 @@ export abstract class IForgotPassword {
 
 @Injectable()
 export class ForgotPassword implements IForgotPassword {
+  // One email a minute per address, so the form can't flood someone's inbox.
+  private readonly sent = new RateLimiter(1, 60_000);
+
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly jwtService: JwtService,
@@ -35,6 +39,7 @@ export class ForgotPassword implements IForgotPassword {
       email: dto.email,
     });
     if (!user || !user.enabled) return;
+    if (!this.sent.hit(user.email.toLowerCase())) return;
 
     const token = await this.jwtService.signAsync(
       { sub: user.id },
@@ -94,6 +99,8 @@ export class ResetPassword implements IResetPassword {
     }
 
     user.password = await bcrypt.hash(dto.password, this.saltOrRounds);
+    // Signs the account out everywhere, in case someone else was in it.
+    user.tokenVersion += 1;
     await this.userRepository.save(user);
   }
 }

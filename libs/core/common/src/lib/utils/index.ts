@@ -4,3 +4,4 @@ export * from './decorators';
 export * from './interceptors';
 export * from './interfaces';
 export * from './validation';
+export * from './rate-limit';

@@ -21,7 +21,11 @@ import { IRegisterWorker } from '../use-cases/services/register-worker';
 import { ILogin, ILoginResponseDTO } from '../use-cases/services/login';
 import { LoginDTO } from './dtos/login.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger';
-import { IGenericExceptionResponseDTO } from '@tpf/common';
+import {
+  IGenericExceptionResponseDTO,
+  RateLimit,
+  RateLimitGuard,
+} from '@tpf/common';
 import { IRegisterClient, RegisterClientDTO } from '../use-cases/services/register-client';
 import { IGetMe } from '../use-cases/services/get-me';
 import { IActivateWorker } from '../use-cases/services/activate-worker';
@@ -36,7 +40,26 @@ import {
   IVerifyEmail,
 } from '../use-cases/services/email-verification';
 
+const MINUTE = 60 * 1000;
+const HOUR = 60 * MINUTE;
+
+// Per address. Generous, since many people share one address on mobile
+// networks; the login and password-reset services also limit per email.
+const SIGN_IN_LIMIT = { name: 'sign-in', limit: 30, windowMs: 15 * MINUTE };
+const SIGN_UP_LIMIT = {
+  name: 'sign-up',
+  limit: 10,
+  windowMs: HOUR,
+  message: 'Muitos cadastros feitos desta rede. Tente de novo mais tarde.',
+};
+const FORGOT_PASSWORD_LIMIT = {
+  name: 'forgot-password',
+  limit: 10,
+  windowMs: HOUR,
+};
+
 @ApiTags('Auth')
+@UseGuards(RateLimitGuard)
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -53,6 +76,8 @@ export class AuthController {
   ) {}
 
   @Post('sign-in')
+  @RateLimit(SIGN_IN_LIMIT)
+  @ApiResponse({ status: 429, type: IGenericExceptionResponseDTO })
   @ApiOperation({ summary: 'Login de usuário' })
   @ApiResponse({ status: 200, type: ILoginResponseDTO })
   @ApiResponse({ status: 404, type: IGenericExceptionResponseDTO })
@@ -62,6 +87,7 @@ export class AuthController {
   }
 
   @Post('worker/sign-up')
+  @RateLimit(SIGN_UP_LIMIT)
   @ApiOperation({ summary: 'Cadastro de trabalhador' })
   @ApiResponse({ status: 201, description: 'Worker registered successfully' })
   @ApiResponse({ status: 409, type: IGenericExceptionResponseDTO })
@@ -81,6 +107,7 @@ export class AuthController {
   }
 
   @Post('client/sign-up')
+  @RateLimit(SIGN_UP_LIMIT)
   @ApiOperation({ summary: 'Cadastro de cliente' })
   @ApiResponse({ status: 201, description: 'Client registered successfully' })
   @ApiResponse({ status: 409, type: IGenericExceptionResponseDTO })
@@ -89,6 +116,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @RateLimit(FORGOT_PASSWORD_LIMIT)
   @ApiOperation({ summary: 'Solicita link de redefinição de senha' })
   @ApiResponse({
     status: 204,

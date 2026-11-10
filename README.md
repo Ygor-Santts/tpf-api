@@ -235,3 +235,5 @@ Rodar os testes e2e:
 ```bash
 npm run test:e2e
 ```
+
+Os testes e2e sobem a API inteira e usam o banco do `.env`, com as migrations aplicadas (passos 4 e 5). Eles criam contas `@e2e.test` e as apagam no fim. **Nunca rode contra o banco de produção.** Em `test/security.e2e-spec.ts` fica um teste para cada falha da revisão de segurança (login revogado, upload do portfólio, limites de tentativas, telefone e avaliação só com e-mail confirmado). O GitHub roda os mesmos testes em cada PR, com um MySQL próprio.

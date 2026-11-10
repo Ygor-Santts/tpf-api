@@ -4,6 +4,12 @@
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
-  }
+    "^.+\\.(t|j)s$": ["ts-jest", { "isolatedModules": true }]
+  },
+  "moduleNameMapper": {
+    "^@tpf/(.*)$": "<rootDir>/../libs/core/$1/src"
+  },
+  "setupFiles": ["<rootDir>/setup-env.ts"],
+  "testTimeout": 30000,
+  "maxWorkers": 1
 }

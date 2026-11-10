@@ -15,7 +15,8 @@ export class WorkerController {
     private readonly GetWorkersByParametersPaginatedView: GetWorkersByParametersPaginated,
   ) {}
 
-  // Public, so visitors can browse; the phone is only sent to signed-in users.
+  // Public, so visitors can browse. The phone is only sent to signed-in users
+  // who confirmed their email, so a throwaway account can't collect them.
   @Get('paginated')
   @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Buscar trabalhadores com filtros paginados' })
@@ -33,6 +34,9 @@ export class WorkerController {
     @Query() dto: GetWorkerByParametersPaginatedDTO,
     @Request() req: any,
   ) {
-    return this.GetWorkersByParametersPaginatedView.get(dto, Boolean(req.user));
+    return this.GetWorkersByParametersPaginatedView.get(
+      dto,
+      Boolean(req.user?.emailVerified),
+    );
   }
 }

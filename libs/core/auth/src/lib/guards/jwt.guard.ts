@@ -5,34 +5,26 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { EntityManager } from '@mikro-orm/core';
 import { Request } from 'express';
+import { bearerToken, findSessionUser } from './session';
 
-export interface JwtPayload {
-  email: string;
-  userId: number;
-  isWorker: boolean;
-  workerId?: number;
-}
+export { JwtPayload, SessionUser } from './session';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    protected readonly em: EntityManager,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromHeader(request);
+    const token = bearerToken(request);
     if (!token) throw new UnauthorizedException('Token não fornecido');
-    try {
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
-      request['user'] = payload;
-    } catch {
-      throw new UnauthorizedException('Token inválido ou expirado');
-    }
+    const user = await findSessionUser(this.jwtService, this.em, token);
+    if (!user) throw new UnauthorizedException('Token inválido ou expirado');
+    request['user'] = user;
     return true;
-  }
-
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

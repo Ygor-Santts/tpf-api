@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,6 +11,15 @@ import { IUserRepository } from '../../data-access/repositories';
 import { ILoginDTO } from '../../presenter/dtos/login.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IUser } from '@tpf/domain';
+import { RateLimiter } from '@tpf/common';
+
+// Compared when the email has no account, so the answer takes as long as
+// for a real one and does not tell which emails are registered.
+const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 10);
+
+// Wrong passwords allowed per email before it waits 15 minutes.
+const MAX_FAILURES = 5;
+const FAILURE_WINDOW_MS = 15 * 60 * 1000;
 
 export class UserProfileDTO {
   @ApiProperty() id: number;
@@ -36,6 +46,8 @@ export abstract class ILogin {
 
 @Injectable()
 export class Login implements ILogin {
+  private readonly failures = new RateLimiter(MAX_FAILURES, FAILURE_WINDOW_MS);
+
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly jwtService: JwtService,
@@ -43,18 +55,25 @@ export class Login implements ILogin {
 
   async execute(dto: ILoginDTO): Promise<ILoginResponseDTO | HttpException> {
     const { email, password } = dto;
+    const key = email.trim().toLowerCase();
+    if (!this.failures.allows(key))
+      return new HttpException(
+        'Muitas tentativas com senha errada. Aguarde 15 minutos ou use "Esqueci minha senha".',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+
     const user = await this.userRepository.findUserWithWorker(email);
-
-    if (!user)
+    const matchPassword = await bcrypt.compare(
+      password,
+      user?.password ?? DUMMY_HASH,
+    );
+    if (!user || !matchPassword) {
+      this.failures.hit(key);
       return new NotFoundException(
         'Dados incorretos. Verifique os dados e tente novamente.',
       );
-
-    const matchPassword = bcrypt.compareSync(password, user.password);
-    if (!matchPassword)
-      return new NotFoundException(
-        'Dados incorretos. Verifique os dados e tente novamente.',
-      );
+    }
+    this.failures.reset(key);
 
     if (!user.enabled)
       return new ForbiddenException('Esta conta está desativada.');
@@ -78,6 +97,7 @@ export async function createSession(
     userId: user.id,
     isWorker,
     workerId,
+    tokenVersion: user.tokenVersion,
   });
 
   return {

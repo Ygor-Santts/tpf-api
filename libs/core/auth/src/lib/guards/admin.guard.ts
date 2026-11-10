@@ -3,31 +3,19 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { EntityManager } from '@mikro-orm/core';
-import { User } from '@tpf/domain';
-import { JwtAuthGuard, JwtPayload } from './jwt.guard';
+import { JwtAuthGuard, SessionUser } from './jwt.guard';
 
 /**
- * Only for admin accounts. Checked against the database on every call, so
- * removing the admin flag or deactivating the account takes effect at once.
+ * Only for admin accounts. Like every signed-in route, the account is read
+ * from the database on each call, so removing the admin flag or deactivating
+ * the account takes effect at once.
  */
 @Injectable()
 export class AdminGuard extends JwtAuthGuard {
-  constructor(
-    jwtService: JwtService,
-    private readonly em: EntityManager,
-  ) {
-    super(jwtService);
-  }
-
   override async canActivate(context: ExecutionContext): Promise<boolean> {
     await super.canActivate(context);
-    const { userId } = context.switchToHttp().getRequest()[
-      'user'
-    ] as JwtPayload;
-    const user = await this.em.fork().findOne(User, { id: userId });
-    if (!user?.isAdmin || !user.enabled)
+    const user = context.switchToHttp().getRequest()['user'] as SessionUser;
+    if (!user.isAdmin)
       throw new ForbiddenException('Acesso restrito ao administrador.');
     return true;
   }
