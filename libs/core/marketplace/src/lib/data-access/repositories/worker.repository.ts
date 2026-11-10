@@ -171,14 +171,23 @@ export class WorkerRepository implements IWorkerRepository {
       whereClause.operationCities = { id: { $in: cityIds } };
     }
 
-    if (dto.jobOccupationIds) {
-      whereClause.jobOccupations = { id: { $in: dto.jobOccupationIds } };
-    }
-
-    if (dto.jobCategoriyIds)
+    // Only reviewed occupations and categories count: one a worker added and
+    // the admin hasn't approved yet doesn't make them show up in search.
+    // Both filters apply to the same occupation when they come together.
+    if (dto.jobOccupationIds?.length || dto.jobCategoriyIds?.length) {
       whereClause.jobOccupations = {
-        category: { id: { $in: dto.jobCategoriyIds } },
+        approved: true,
+        category: {
+          approved: true,
+          ...(dto.jobCategoriyIds?.length && {
+            id: { $in: dto.jobCategoriyIds },
+          }),
+        },
+        ...(dto.jobOccupationIds?.length && {
+          id: { $in: dto.jobOccupationIds },
+        }),
       };
+    }
 
     if (eligibleWorkerIds !== undefined) {
       whereClause.id = { $in: eligibleWorkerIds };
