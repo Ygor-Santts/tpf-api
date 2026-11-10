@@ -6,6 +6,7 @@ export abstract class IJobCategoryRepository {
   abstract getByIds(ids: number[]): Promise<IJobCategory[]>;
   /** Every category, approved or still waiting for review. */
   abstract getAll(): Promise<IJobCategory[]>;
+  /** Approved categories that have an approved occupation. */
   abstract getApproved(): Promise<IJobCategory[]>;
   abstract create(name: string, approved?: boolean): Promise<IJobCategory>;
 }
@@ -26,8 +27,12 @@ export class JobCategoryRepository implements IJobCategoryRepository {
     return this._repository.findAll();
   }
 
+  /** Approved categories with at least one approved occupation to pick. */
   getApproved(): Promise<IJobCategory[]> {
-    return this._repository.find({ approved: true });
+    return this._repository.find({
+      approved: true,
+      jobOccupations: { approved: true },
+    });
   }
 
   async create(name: string, approved = true): Promise<IJobCategory> {

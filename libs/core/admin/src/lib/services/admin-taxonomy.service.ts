@@ -144,10 +144,12 @@ export class AdminTaxonomyService {
     this.em.clear();
   }
 
+  /** An occupation the admin creates is approved, and so is its category. */
   async createOccupation(categoryId: number, name: string): Promise<void> {
     const category = await this.findCategory(categoryId);
     const clean = tidy(name);
     await this.assertFreeOccupationName(category.id, clean);
+    category.approved = true;
     await this.em.persistAndFlush(new JobOccupation({ name: clean, category }));
   }
 
