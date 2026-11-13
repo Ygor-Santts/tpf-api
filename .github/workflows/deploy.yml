@@ -47,9 +47,18 @@ jobs:
             export GIT_TERMINAL_PROMPT=0
             cd ~/tpf-api
             OLD_CADDYFILE=$(git rev-parse HEAD:Caddyfile)
+            OLD_API=$(git rev-parse HEAD)
+            OLD_APP=$(git -C ../tpf-app rev-parse HEAD)
             git pull --ff-only
             git -C ../tpf-app pull --ff-only
-            docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
+            # Only rebuild the API and the app when their code changed. A push that
+            # only touches the Caddyfile, docs or workflows must not restart the API.
+            CODE_CHANGED=$(git diff --name-only "$OLD_API" HEAD | grep -vE "^(Caddyfile|README\.md|\.github/|deploy/)" || true)
+            if [ -n "$CODE_CHANGED" ] || [ "$OLD_APP" != "$(git -C ../tpf-app rev-parse HEAD)" ]; then
+              docker compose --env-file .env.server -f docker-compose.server.yml up -d --build
+            else
+              echo "Only config or docs changed: API and app containers left running as they are."
+            fi
             # Caddy only reads its config at start, and compose does not
             # restart it when just the Caddyfile changed.
             if [ "$OLD_CADDYFILE" != "$(git rev-parse HEAD:Caddyfile)" ]; then
